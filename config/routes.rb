@@ -1,4 +1,11 @@
 Combat::Application.routes.draw do |map|
+  root :to => 'maps#latest'
+
+  resources :maps do
+    member do
+      get :latest
+    end
+  end
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

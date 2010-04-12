@@ -2,34 +2,6 @@
   <canvas id="map" width="800" height="600"></canvas>
 </div>
 <%= javascript_tag do %>
-  var map = document.getElementById('map');
-  var map_width = map.width;
-  var map_height = map.height;
-  var context = map.getContext('2d');
-  var cell_size = Math.floor(Math.min(
-    map_width / <%= @map.width.to_json %>, 
-    map_height / <%= @map.height.to_json %>
-  ));
-  // draw the gridlines
-  context.beginPath();
-  for (var x=0.5; x < map.width; x += cell_size) {
-    context.moveTo(x, 0.5);
-    context.lineTo(x, map.height);
-  }
-  for (var y=0.5; y < map.height; y += cell_size) {
-    context.moveTo(0.5, y);
-    context.lineTo(map_width, y);
-  }
-  context.stroke();
-
-  context.font = '' + cell_size + 'px courier';
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  <% @map.figures.each do |figure| %>
-    context.fillText(
-      '<%= figure.character %>',
-      0.5 + cell_size / 2 + <%= figure.position_x.to_json %> * cell_size,
-      0.5 + cell_size / 2 + <%= figure.position_y.to_json %> * cell_size
-    );
-  <% end %>
+  var map = new Map(<%= @map.to_json(:include => :figures).html_safe %>);
+  map.draw();
 <% end %>

@@ -11,6 +11,16 @@ var Map = function(json_arg, id_arg) {
     canvas.width / json.width,
     canvas.height / json.height
   );
+  var selectedFigure;
+
+  function getFigure(id) {
+    for (var i=0; i < json.figures.length; i++) {
+      var figure = json.figures[i];
+      if (figure.id == id) {
+        return figure;
+      }
+    }
+  }
 
   function getTile(x, y) {
     tile_x = Math.floor(x / tile_size);
@@ -50,16 +60,28 @@ var Map = function(json_arg, id_arg) {
   }
 
   function drawFigures() {
+    context.save();
     context.font = '' + tile_size + 'px courier';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillStyle = 'rgba(0, 0, 0, 1)';
     for (var i=0; i < json.figures.length; i++) {
+      context.save();
       var figure = json.figures[i];
       var center_x = tile_size / 2 + figure.position_x * tile_size;
       var center_y = tile_size / 2 + figure.position_y * tile_size;
+      if (figure == selectedFigure) {
+        context.fillStyle = 'rgba(0, 0, 255, 1)'
+        context.shadowOffsetX = 3;
+        context.shadowOffsetY = 3;
+        context.shadowBlur = 2;
+        context.shadowColor = 'rgba(0, 0, 175, 0.5)';
+      } else {
+        context.fillStyle = 'rgba(0, 0, 0, 1)';
+      }
       context.fillText(figure.character, center_x, center_y);
+      context.restore();
       
+      context.save();
       // 5' reach
       context.beginPath();
       context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
@@ -69,7 +91,9 @@ var Map = function(json_arg, id_arg) {
       context.beginPath();
       context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
       context.stroke();
+      context.restore();
     }
+    context.restore();
   }
 
   function drawGrid() {
@@ -86,16 +110,31 @@ var Map = function(json_arg, id_arg) {
   }
 
   function draw() {
-    context.save();
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
     drawHighlightedTiles();
     drawFigures();
-    context.restore();
   }
 
   function click(evt) {
-    toggleHighlightTile(getTile(evt.pageX, evt.pageY));
+    //toggleHighlightTile(getTile(evt.pageX, evt.pageY));
+    tile = getTile(evt.pageX, evt.pageY);
+    for (var i=0; i<json.figures.length; i++) {
+      var figure = json.figures[i];
+      if (figure.position_x == tile.x && figure.position_y == tile.y) {
+        if (figure == selectedFigure) {
+          selectedFigure = null;
+        } else {
+          selectedFigure = figure;
+        }
+        draw();
+        return;
+      }
+    }
+    if (selectedFigure != null) {
+      selectedFigure = null;
+      draw();
+    }
   }
 
   function init() {

@@ -25,17 +25,25 @@ var Map = function(json_arg) {
   }
 
   function toggleHighlightTile(tile) {
-    var x = 1 + tile.x * tile_size;
-    var y = 1 + tile.y * tile_size;
-    var w = tile_size - 1;
-    var h = tile_size - 1;
     if (tile.highlighted) {
-      context.clearRect(x, y, w, h);
       tile.highlighted = false;
     } else {
-      context.fillStyle = 'rgba(255, 0, 0, 0.25)';
-      context.fillRect(x, y, w, h);
       tile.highlighted = true;
+    }
+    draw();
+  }
+
+  function drawHighlightedTiles() {
+    context.fillStyle = 'rgba(255, 0, 0, 0.25)';
+    for (var coordinates in tiles) {
+      var tile = tiles[coordinates];
+      if (tile.highlighted) {
+        var x = 1 + tile.x * tile_size;
+        var y = 1 + tile.y * tile_size;
+        var w = tile_size - 1;
+        var h = tile_size - 1;
+        context.fillRect(x, y, w, h);
+      }
     }
   }
 
@@ -43,6 +51,7 @@ var Map = function(json_arg) {
     context.font = '' + tile_size + 'px courier';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
+    context.fillStyle = 'rgba(0, 0, 0, 1)';
     for (var i=0; i < json.figures.length; i++) {
       var figure = json.figures[i];
       var center_x = tile_size / 2 + figure.position_x * tile_size;
@@ -51,12 +60,12 @@ var Map = function(json_arg) {
       
       // 5' reach
       context.beginPath();
-      context.arc(center_x, center_y, tile_size, 0, Math.PI*2, true);
+      context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
       context.stroke();
 
       // 10' reach
       context.beginPath();
-      context.arc(center_x, center_y, tile_size * 2, 0, Math.PI*2, true);
+      context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
       context.stroke();
     }
   }
@@ -74,16 +83,21 @@ var Map = function(json_arg) {
     context.stroke();
   }
 
+  function draw() {
+    context.save();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    drawHighlightedTiles();
+    drawFigures();
+    context.restore();
+  }
+
   return {
-    draw: function() {
-      context.save();
-      drawGrid();
-      drawFigures();
+    init: function() {
+      draw();
       $('#map').click(function(evt) {
-        var tile = getTile(evt.pageX, evt.pageY);
-        toggleHighlightTile(tile);
+        toggleHighlightTile(getTile(evt.pageX, evt.pageY));
       });
-      context.restore();
     }
   }
 }

@@ -3,5 +3,5 @@
 </div>
 <%= javascript_tag do %>
   var map = new Map(<%= @map.to_json(:include => :figures).html_safe %>);
-  map.draw();
+  map.init();
 <% end %>

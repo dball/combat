@@ -1,10 +1,12 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
-var Map = function(json_arg) {
+var Map = function(json_arg, id_arg) {
   var json = json_arg;
-  var tiles = new Object();
-  var canvas = document.getElementById('map');
+  var id = id_arg;
+  var selector = "#" + id;
+  var canvas = document.getElementById(id);
   var context = canvas.getContext('2d');
+  var tiles = new Object();
   var tile_size = Math.min(
     canvas.width / json.width,
     canvas.height / json.height
@@ -92,12 +94,16 @@ var Map = function(json_arg) {
     context.restore();
   }
 
+  function click(evt) {
+    toggleHighlightTile(getTile(evt.pageX, evt.pageY));
+  }
+
+  function init() {
+    draw();
+    $(selector).click(click);
+  }
+
   return {
-    init: function() {
-      draw();
-      $('#map').click(function(evt) {
-        toggleHighlightTile(getTile(evt.pageX, evt.pageY));
-      });
-    }
+    init: init
   }
 }

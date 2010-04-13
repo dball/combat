@@ -2,6 +2,6 @@
   <canvas id="map" width="800" height="600"></canvas>
 </div>
 <%= javascript_tag do %>
-  var map = new Map(<%= @map.to_json(:include => :figures).html_safe %>);
+  var map = new Map(<%= @map.to_json(:include => :figures).html_safe %>, 'map');
   map.init();
 <% end %>

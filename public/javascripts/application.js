@@ -11,16 +11,12 @@ var Map = function(json_arg, id_arg) {
     canvas.width / json.width,
     canvas.height / json.height
   );
-  var selectedFigure;
-
-  function getFigure(id) {
-    for (var i=0; i < json.figures.length; i++) {
-      var figure = json.figures[i];
-      if (figure.id == id) {
-        return figure;
-      }
-    }
+  var figures = new Object();
+  for (var i=0; i < json.figures.length; i++) {
+    var figure = new Figure(json.figures[i]);
+    figures[figure.id] = figure;
   }
+  var selectedFigure;
 
   function getTile(x, y) {
     tile_x = Math.floor(x / tile_size);
@@ -64,9 +60,9 @@ var Map = function(json_arg, id_arg) {
     context.font = '' + tile_size + 'px courier';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    for (var i=0; i < json.figures.length; i++) {
+    for (var id in figures) {
       context.save();
-      var figure = json.figures[i];
+      var figure = figures[id];
       var center_x = tile_size / 2 + figure.position_x * tile_size;
       var center_y = tile_size / 2 + figure.position_y * tile_size;
       if (figure == selectedFigure) {
@@ -119,8 +115,8 @@ var Map = function(json_arg, id_arg) {
   function click(evt) {
     //toggleHighlightTile(getTile(evt.pageX, evt.pageY));
     tile = getTile(evt.pageX, evt.pageY);
-    for (var i=0; i<json.figures.length; i++) {
-      var figure = json.figures[i];
+    for (var id in figures) {
+      var figure = figures[id];
       if (figure.position_x == tile.x && figure.position_y == tile.y) {
         if (figure == selectedFigure) {
           selectedFigure = null;
@@ -140,6 +136,18 @@ var Map = function(json_arg, id_arg) {
   function init() {
     draw();
     $(selector).click(click);
+  }
+
+  function Figure(json) {
+    var json = json;
+
+    return {
+      position_x: json.position_x,
+      position_y: json.position_y,
+      character: json.character,
+      size: json.size,
+      id: json.id
+    }
   }
 
   return {

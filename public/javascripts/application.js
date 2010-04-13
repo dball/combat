@@ -42,6 +42,7 @@ var Map = function(json_arg, id_arg) {
   }
 
   function drawHighlightedTiles() {
+    context.save();
     context.fillStyle = 'rgba(255, 0, 0, 0.25)';
     for (var coordinates in tiles) {
       var tile = tiles[coordinates];
@@ -53,46 +54,11 @@ var Map = function(json_arg, id_arg) {
         context.fillRect(x, y, w, h);
       }
     }
-  }
-
-  function drawFigures() {
-    context.save();
-    context.font = '' + tile_size + 'px courier';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    for (var id in figures) {
-      context.save();
-      var figure = figures[id];
-      var center_x = tile_size / 2 + figure.position_x * tile_size;
-      var center_y = tile_size / 2 + figure.position_y * tile_size;
-      if (figure == selectedFigure) {
-        context.fillStyle = 'rgba(0, 0, 255, 1)'
-        context.shadowOffsetX = 3;
-        context.shadowOffsetY = 3;
-        context.shadowBlur = 2;
-        context.shadowColor = 'rgba(0, 0, 175, 0.5)';
-      } else {
-        context.fillStyle = 'rgba(0, 0, 0, 1)';
-      }
-      context.fillText(figure.character, center_x, center_y);
-      context.restore();
-      
-      context.save();
-      // 5' reach
-      context.beginPath();
-      context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
-      context.stroke();
-
-      // 10' reach
-      context.beginPath();
-      context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
-      context.stroke();
-      context.restore();
-    }
     context.restore();
   }
 
   function drawGrid() {
+    context.save();
     context.beginPath();
     for (var x=0.5; x < canvas.width; x += tile_size) {
       context.moveTo(x, 0.5);
@@ -103,13 +69,16 @@ var Map = function(json_arg, id_arg) {
       context.lineTo(canvas.width, y);
     }
     context.stroke();
+    context.restore();
   }
 
   function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
     drawHighlightedTiles();
-    drawFigures();
+    for (var id in figures) {
+      figures[id].draw();
+    }
   }
 
   function click(evt) {
@@ -117,7 +86,7 @@ var Map = function(json_arg, id_arg) {
     tile = getTile(evt.pageX, evt.pageY);
     for (var id in figures) {
       var figure = figures[id];
-      if (figure.position_x == tile.x && figure.position_y == tile.y) {
+      if (figure.x == tile.x && figure.y == tile.y) {
         if (figure == selectedFigure) {
           selectedFigure = null;
         } else {
@@ -141,12 +110,42 @@ var Map = function(json_arg, id_arg) {
   function Figure(json) {
     var json = json;
 
+    function draw() {
+      context.save();
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.font = '' + tile_size + 'px courier';
+      var center_x = tile_size / 2 + json.position_x * tile_size;
+      var center_y = tile_size / 2 + json.position_y * tile_size;
+      if (this == selectedFigure) {
+        context.fillStyle = 'rgba(0, 0, 255, 1)'
+        context.shadowOffsetX = 2;
+        context.shadowOffsetY = 2;
+        context.shadowBlur = 1;
+        context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      } else {
+        context.fillStyle = 'rgba(0, 0, 0, 1)';
+      }
+      context.fillText(json.character, center_x, center_y);
+      context.restore();
+      
+      context.save();
+      // 5' reach
+      context.beginPath();
+      context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
+      context.stroke();
+      // 10' reach
+      context.beginPath();
+      context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
+      context.stroke();
+      context.restore();
+    }
+
     return {
-      position_x: json.position_x,
-      position_y: json.position_y,
-      character: json.character,
-      size: json.size,
-      id: json.id
+      x: json.position_x,
+      y: json.position_y,
+      id: json.id,
+      draw: draw
     }
   }
 

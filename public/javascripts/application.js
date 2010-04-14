@@ -17,14 +17,21 @@ var Map = function(json_arg, id_arg) {
   var selected_figure;
   var hover_tile;
 
-  function getTile(x, y) {
-    var tp = {
-      x: Math.floor(x / tile_size),
-      y: Math.floor(y / tile_size)
-    }
-    var key = '' + tp.x + ',' + tp.y;
+  function getTileByPixel(x, y) {
+    return getTileByPosition(Math.floor(x / tile_size), Math.floor(y / tile_size));
+  }
+
+  function getTileByPosition(x, y) {
+    var key = '' + x + ',' + y;
     var tile = tiles[key];
-    return (tile != null ? tile : tiles[key] = tp)
+    if (tile != null) {
+      return tile;
+    } else {
+      return tiles[key] = {
+        x: x,
+        y: y
+      }
+    }
   }
 
   function drawHoverTile() {
@@ -67,7 +74,13 @@ var Map = function(json_arg, id_arg) {
   /* Event handlers */
 
   function click(evt) {
-    tile = getTile(evt.pageX, evt.pageY);
+    tile = getTileByPixel(evt.pageX, evt.pageY);
+    if (selected_figure) {
+      selected_figure.moveToTile(tile);
+      selected_figure = null;
+      draw();
+      return;
+    }
     for (var id in figures) {
       var figure = figures[id];
       if (figure.inTile(tile)) {
@@ -87,7 +100,7 @@ var Map = function(json_arg, id_arg) {
   }
 
   function mousemove(evt) {
-    tile = getTile(evt.pageX, evt.pageY);
+    tile = getTileByPixel(evt.pageX, evt.pageY);
     if (tile != hover_tile) {
       hover_tile = tile;
       draw();
@@ -97,10 +110,13 @@ var Map = function(json_arg, id_arg) {
   /* Child models */
 
   function Figure(json) {
-    var json = json;
+    var size = json.size;
+    var character = json.character;
+    var tile = getTileByPosition(json.position_x, json.position_y);
+    var id = json.id;
 
     function getScale() {
-      switch(json.size) {
+      switch(size) {
         case 'L':
           return 2;
         case 'H':
@@ -113,17 +129,21 @@ var Map = function(json_arg, id_arg) {
       return 1;
     }
 
-    function inTile(tile) {
+    function moveToTile(target) {
+      tile = target;
+    }
+
+    function inTile(target) {
       var scale = getScale();
-      return tile.x >= this.x && tile.x < this.x + scale &&
-        tile.y >= this.y && tile.y < this.y + scale;
+      return target.x >= tile.x && target.x < tile.x + scale &&
+        target.y >= tile.y && target.y < tile.y + scale;
     }
 
     function draw() {
       context.save();
       var offset = {
-        x: json.position_x * tile_size,
-        y: json.position_y * tile_size
+        x: tile.x * tile_size,
+        y: tile.y * tile_size
       }
       var scaled = getScale() * tile_size;
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
@@ -144,27 +164,15 @@ var Map = function(json_arg, id_arg) {
       } else {
         context.fillStyle = 'rgba(0, 0, 0, 1)';
       }
-      context.fillText(json.character, center.x, center.y);
+      context.fillText(character, center.x, center.y);
       context.restore();
-
-      //context.save();
-      // 5' reach
-      //context.beginPath();
-      //context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
-      //context.stroke();
-      // 10' reach
-      //context.beginPath();
-      //context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
-      //context.stroke();
-      //context.restore();
     }
 
     return {
-      x: json.position_x,
-      y: json.position_y,
-      id: json.id,
+      id: id,
       draw: draw,
-      inTile: inTile
+      inTile: inTile,
+      moveToTile: moveToTile
     }
   }
 

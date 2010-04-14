@@ -33,8 +33,12 @@ var Map = function(json_arg, id_arg) {
     return (tile != null) ? tile : tiles[key] = new Tile(x, y);
   }
 
+  function shouldDrawCursor() {
+    return (cursor.tile != null && (selected.figure != null || selected.action == 'c'));
+  }
+
   function drawCursor() {
-    if (cursor.tile != null && (selected.figure != null || selected.action == 'c')) {
+    if (shouldDrawCursor()) {
       context.save();
       context.fillStyle = 'rgba(255, 0, 0, 0.25)';
       var x = 1 + cursor.tile.x * tile_size;
@@ -161,7 +165,9 @@ var Map = function(json_arg, id_arg) {
     tile = getTileByPixel(evt.pageX, evt.pageY);
     if (tile != cursor.tile) {
       cursor.tile = tile;
-      draw();
+      if (shouldDrawCursor()) {
+        draw();
+      }
     }
   }
 

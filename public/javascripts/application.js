@@ -14,7 +14,8 @@ var Map = function(json_arg, id_arg) {
     var figure = new Figure(json.figures[i]);
     figures[figure.id] = figure;
   }
-  var selectedFigure;
+  var selected_figure;
+  var hover_tile;
 
   function getTile(x, y) {
     var tp = {
@@ -26,29 +27,17 @@ var Map = function(json_arg, id_arg) {
     return (tile != null ? tile : tiles[key] = tp)
   }
 
-  function toggleHighlightTile(tile) {
-    if (tile.highlighted) {
-      tile.highlighted = false;
-    } else {
-      tile.highlighted = true;
+  function drawHoverTile() {
+    if (hover_tile != null) {
+      context.save();
+      context.fillStyle = 'rgba(255, 0, 0, 0.25)';
+      var x = 1 + hover_tile.x * tile_size;
+      var y = 1 + hover_tile.y * tile_size;
+      var w = tile_size - 1;
+      var h = tile_size - 1;
+      context.fillRect(x, y, w, h);
+      context.restore();
     }
-    draw();
-  }
-
-  function drawHighlightedTiles() {
-    context.save();
-    context.fillStyle = 'rgba(255, 0, 0, 0.25)';
-    for (var coordinates in tiles) {
-      var tile = tiles[coordinates];
-      if (tile.highlighted) {
-        var x = 1 + tile.x * tile_size;
-        var y = 1 + tile.y * tile_size;
-        var w = tile_size - 1;
-        var h = tile_size - 1;
-        context.fillRect(x, y, w, h);
-      }
-    }
-    context.restore();
   }
 
   function drawGrid() {
@@ -69,37 +58,43 @@ var Map = function(json_arg, id_arg) {
   function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
-    drawHighlightedTiles();
+    drawHoverTile();
     for (var id in figures) {
       figures[id].draw();
     }
   }
 
+  /* Event handlers */
+
   function click(evt) {
-    //toggleHighlightTile(getTile(evt.pageX, evt.pageY));
     tile = getTile(evt.pageX, evt.pageY);
     for (var id in figures) {
       var figure = figures[id];
       if (figure.x == tile.x && figure.y == tile.y) {
-        if (figure == selectedFigure) {
-          selectedFigure = null;
+        if (figure == selected_figure) {
+          selected_figure = null;
         } else {
-          selectedFigure = figure;
+          selected_figure = figure;
         }
         draw();
         return;
       }
     }
-    if (selectedFigure != null) {
-      selectedFigure = null;
+    if (selected_figure != null) {
+      selected_figure = null;
       draw();
     }
   }
 
-  function init() {
-    draw();
-    $(selector).click(click);
+  function mousemove(evt) {
+    tile = getTile(evt.pageX, evt.pageY);
+    if (tile != hover_tile) {
+      hover_tile = tile;
+      draw();
+    }
   }
+
+  /* Child models */
 
   function Figure(json) {
     var json = json;
@@ -132,7 +127,7 @@ var Map = function(json_arg, id_arg) {
         x: scaled / 2 + offset.x,
         y: scaled / 2 + offset.y
       }
-      if (this == selectedFigure) {
+      if (this == selected_figure) {
         context.fillStyle = 'rgba(0, 0, 255, 1)'
         context.shadowOffsetX = 2;
         context.shadowOffsetY = 2;
@@ -165,6 +160,13 @@ var Map = function(json_arg, id_arg) {
       id: json.id,
       draw: draw
     }
+  }
+
+  function init() {
+    draw();
+    $(selector)
+      .click(click)
+      .mousemove(mousemove);
   }
 
   return {

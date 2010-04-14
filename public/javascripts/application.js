@@ -1,5 +1,3 @@
-// Place your application-specific JavaScript functions and classes here
-// This file is automatically included by javascript_include_tag :defaults
 var Map = function(json_arg, id_arg) {
   var json = json_arg;
   var id = id_arg;
@@ -19,17 +17,13 @@ var Map = function(json_arg, id_arg) {
   var selectedFigure;
 
   function getTile(x, y) {
-    tile_x = Math.floor(x / tile_size);
-    tile_y = Math.floor(y / tile_size);
-    var key = '' + tile_x + ',' + tile_y;
-    var tile = tiles[key];
-    if (tile == null) {
-      tile = new Object();
-      tile.x = tile_x;
-      tile.y = tile_y;
-      tiles[key] = tile;
+    var tp = {
+      x: Math.floor(x / tile_size),
+      y: Math.floor(y / tile_size)
     }
-    return tile;
+    var key = '' + tp.x + ',' + tp.y;
+    var tile = tiles[key];
+    return (tile != null ? tile : tiles[key] = tp)
   }
 
   function toggleHighlightTile(tile) {
@@ -110,28 +104,34 @@ var Map = function(json_arg, id_arg) {
   function Figure(json) {
     var json = json;
 
+    function getScale() {
+      switch(json.size) {
+        case 'L':
+          return 2;
+        case 'H':
+          return 3;
+        case 'G':
+          return 4;
+        case 'C':
+          return 6;
+      }
+      return 1;
+    }
+
     function draw() {
       context.save();
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      var scale = 1;
-      switch(json.size) {
-        case 'L':
-          scale = 2;
-          break;
-        case 'H':
-          scale = 3;
-          break;
-        case 'G':
-          scale = 4;
-          break;
-        case 'C':
-          scale = 6;
-          break;
+      var scaled = getScale() * tile_size;
+      context.font = '' + scaled + 'px courier';
+      var offset = {
+        x: json.position_x * tile_size,
+        y: json.position_y * tile_size
       }
-      context.font = '' + scale * tile_size + 'px courier';
-      var center_x = (scale * tile_size) / 2 + json.position_x * tile_size;
-      var center_y = (scale * tile_size) / 2 + json.position_y * tile_size;
+      var center = {
+        x: scaled / 2 + offset.x,
+        y: scaled / 2 + offset.y
+      }
       if (this == selectedFigure) {
         context.fillStyle = 'rgba(0, 0, 255, 1)'
         context.shadowOffsetX = 2;
@@ -141,17 +141,10 @@ var Map = function(json_arg, id_arg) {
       } else {
         context.fillStyle = 'rgba(0, 0, 0, 1)';
       }
-      context.fillText(json.character, center_x, center_y);
-      context.font = '' + tile_size + 'px courier'
-      context.fillText("(" + json.position_x + "," + json.position_y + ")", center_x, center_y + tile_size);
+      context.fillText(json.character, center.x, center.y);
 
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
-      context.fillRect(
-        json.position_x * tile_size,
-        json.position_y * tile_size,
-        scale * tile_size,
-        scale * tile_size
-      );
+      context.fillRect(offset.x, offset.y, scaled, scaled);
       context.restore();
 
       //context.save();

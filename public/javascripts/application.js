@@ -70,7 +70,7 @@ var Map = function(json_arg, id_arg) {
     tile = getTile(evt.pageX, evt.pageY);
     for (var id in figures) {
       var figure = figures[id];
-      if (figure.x == tile.x && figure.y == tile.y) {
+      if (figure.inTile(tile)) {
         if (figure == selected_figure) {
           selected_figure = null;
         } else {
@@ -113,16 +113,24 @@ var Map = function(json_arg, id_arg) {
       return 1;
     }
 
+    function inTile(tile) {
+      var scale = getScale();
+      return tile.x >= this.x && tile.x < this.x + scale &&
+        tile.y >= this.y && tile.y < this.y + scale;
+    }
+
     function draw() {
       context.save();
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      var scaled = getScale() * tile_size;
-      context.font = '' + scaled + 'px courier';
       var offset = {
         x: json.position_x * tile_size,
         y: json.position_y * tile_size
       }
+      var scaled = getScale() * tile_size;
+      context.fillStyle = 'rgba(100, 100, 100, 0.3)';
+      context.fillRect(offset.x, offset.y, scaled, scaled);
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.font = '' + scaled + 'px courier';
       var center = {
         x: scaled / 2 + offset.x,
         y: scaled / 2 + offset.y
@@ -137,9 +145,6 @@ var Map = function(json_arg, id_arg) {
         context.fillStyle = 'rgba(0, 0, 0, 1)';
       }
       context.fillText(json.character, center.x, center.y);
-
-      context.fillStyle = 'rgba(100, 100, 100, 0.3)';
-      context.fillRect(offset.x, offset.y, scaled, scaled);
       context.restore();
 
       //context.save();
@@ -158,7 +163,8 @@ var Map = function(json_arg, id_arg) {
       x: json.position_x,
       y: json.position_y,
       id: json.id,
-      draw: draw
+      draw: draw,
+      inTile: inTile
     }
   }
 

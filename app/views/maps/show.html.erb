@@ -1,5 +1,5 @@
 <div id="viewport">
-  <canvas id="map" width="800" height="600"></canvas>
+  <canvas id="map" width="1560" height="800"></canvas>
 </div>
 <%= javascript_tag do %>
   var map = new Map(<%= @map.to_json(:include => :figures).html_safe %>, 'map');

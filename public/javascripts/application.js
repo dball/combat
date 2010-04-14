@@ -114,9 +114,24 @@ var Map = function(json_arg, id_arg) {
       context.save();
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.font = '' + tile_size + 'px courier';
-      var center_x = tile_size / 2 + json.position_x * tile_size;
-      var center_y = tile_size / 2 + json.position_y * tile_size;
+      var scale = 1;
+      switch(json.size) {
+        case 'L':
+          scale = 2;
+          break;
+        case 'H':
+          scale = 3;
+          break;
+        case 'G':
+          scale = 4;
+          break;
+        case 'C':
+          scale = 6;
+          break;
+      }
+      context.font = '' + scale * tile_size + 'px courier';
+      var center_x = (scale * tile_size) / 2 + json.position_x * tile_size;
+      var center_y = (scale * tile_size) / 2 + json.position_y * tile_size;
       if (this == selectedFigure) {
         context.fillStyle = 'rgba(0, 0, 255, 1)'
         context.shadowOffsetX = 2;
@@ -127,18 +142,28 @@ var Map = function(json_arg, id_arg) {
         context.fillStyle = 'rgba(0, 0, 0, 1)';
       }
       context.fillText(json.character, center_x, center_y);
+      context.font = '' + tile_size + 'px courier'
+      context.fillText("(" + json.position_x + "," + json.position_y + ")", center_x, center_y + tile_size);
+
+      context.fillStyle = 'rgba(100, 100, 100, 0.3)';
+      context.fillRect(
+        json.position_x * tile_size,
+        json.position_y * tile_size,
+        scale * tile_size,
+        scale * tile_size
+      );
       context.restore();
-      
-      context.save();
+
+      //context.save();
       // 5' reach
-      context.beginPath();
-      context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
-      context.stroke();
+      //context.beginPath();
+      //context.arc(center_x, center_y, tile_size * 1.5, 0, Math.PI*2, true);
+      //context.stroke();
       // 10' reach
-      context.beginPath();
-      context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
-      context.stroke();
-      context.restore();
+      //context.beginPath();
+      //context.arc(center_x, center_y, tile_size * 2.5, 0, Math.PI*2, true);
+      //context.stroke();
+      //context.restore();
     }
 
     return {

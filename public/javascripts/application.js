@@ -117,12 +117,14 @@ var Map = function(json_arg, id_arg) {
           }
           break;
         case 'c':
-          figures.push(new Figure({
+          var figure = new Figure({
             position_x: cursor.tile.x,
             position_y: cursor.tile.y,
             character: character,
             size: 'M'
-          }));
+          });
+          figure.save();
+          figures.push(figure);
           selected.action = null;
           draw();
           break;
@@ -163,14 +165,31 @@ var Map = function(json_arg, id_arg) {
     this.id = json.id;
 
     this.save = function() {
-      $.ajax({
-        type: 'PUT',
-        url: window.location.href + "/figures/" + this.id,
-        data: {
-          'figure[position_x]': this.tile.x,
-          'figure[position_y]': this.tile.y
-        }
-      });
+      var data = {
+        'figure[character]': this.character,
+        'figure[size]': this.size,
+        'figure[position_x]': this.tile.x,
+        'figure[position_y]': this.tile.y
+      }
+      if (this.id == null) {
+        var figure = this;
+        $.ajax({
+          type: 'POST',
+          url: window.location.href + "/figures",
+          data: data,
+          success: function(results) {
+            console.log("saving figure", figure);
+            figure.id = results.id;
+            console.log("saved figure", figure);
+          }
+        });
+      } else {
+        $.ajax({
+          type: 'PUT',
+          url: window.location.href + "/figures/" + this.id,
+          data: data
+        });
+      }
     }
 
     this.getScale = function() {

@@ -162,6 +162,17 @@ var Map = function(json_arg, id_arg) {
     this.tile = getTileByPosition(json.position_x, json.position_y);
     this.id = json.id;
 
+    this.save = function() {
+      $.ajax({
+        type: 'PUT',
+        url: window.location.href + "/figures/" + this.id,
+        data: {
+          'figure[position_x]': this.tile.x,
+          'figure[position_y]': this.tile.y
+        }
+      });
+    }
+
     this.getScale = function() {
       switch(this.size) {
         case 'L':
@@ -178,6 +189,7 @@ var Map = function(json_arg, id_arg) {
 
     this.moveToTile = function(target) {
       this.tile = target;
+      this.save();
     }
 
     this.inTile = function(target) {

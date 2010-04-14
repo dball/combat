@@ -15,7 +15,10 @@ var Map = function(json_arg, id_arg) {
     figures[figure.id] = figure;
   }
   var selected_figure;
-  var hover_tile;
+  var cursor = {
+    tile: null,
+    size: 1
+  }
 
   function getTileByPixel(x, y) {
     return getTileByPosition(Math.floor(x / tile_size), Math.floor(y / tile_size));
@@ -34,14 +37,14 @@ var Map = function(json_arg, id_arg) {
     }
   }
 
-  function drawHoverTile() {
-    if (hover_tile != null) {
+  function drawCursor() {
+    if (cursor.tile != null) {
       context.save();
       context.fillStyle = 'rgba(255, 0, 0, 0.25)';
-      var x = 1 + hover_tile.x * tile_size;
-      var y = 1 + hover_tile.y * tile_size;
-      var w = tile_size - 1;
-      var h = tile_size - 1;
+      var x = 1 + cursor.tile.x * tile_size;
+      var y = 1 + cursor.tile.y * tile_size;
+      var w = (tile_size - 1) * cursor.size;
+      var h = (tile_size - 1) * cursor.size;
       context.fillRect(x, y, w, h);
       context.restore();
     }
@@ -65,7 +68,7 @@ var Map = function(json_arg, id_arg) {
   function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
-    drawHoverTile();
+    drawCursor();
     for (var id in figures) {
       figures[id].draw();
     }
@@ -78,6 +81,7 @@ var Map = function(json_arg, id_arg) {
     if (selected_figure) {
       selected_figure.moveToTile(tile);
       selected_figure = null;
+      cursor.size = 1;
       draw();
       return;
     }
@@ -86,8 +90,10 @@ var Map = function(json_arg, id_arg) {
       if (figure.inTile(tile)) {
         if (figure == selected_figure) {
           selected_figure = null;
+          cursor.size = 1;
         } else {
           selected_figure = figure;
+          cursor.size = figure.getScale();
         }
         draw();
         return;
@@ -101,8 +107,8 @@ var Map = function(json_arg, id_arg) {
 
   function mousemove(evt) {
     tile = getTileByPixel(evt.pageX, evt.pageY);
-    if (tile != hover_tile) {
-      hover_tile = tile;
+    if (tile != cursor.tile) {
+      cursor.tile = tile;
       draw();
     }
   }
@@ -170,6 +176,7 @@ var Map = function(json_arg, id_arg) {
 
     return {
       id: id,
+      getScale: getScale,
       draw: draw,
       inTile: inTile,
       moveToTile: moveToTile

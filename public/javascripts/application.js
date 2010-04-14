@@ -125,20 +125,19 @@ var Map = function(json_arg, id_arg) {
         }
       }
       if (results.length > 1) {
-        console.log("tile contains multitudes", results);
       }
       return results;
     }
   }
 
   function Figure(json) {
-    var size = json.size;
-    var character = json.character;
-    var tile = getTileByPosition(json.position_x, json.position_y);
-    var id = json.id;
+    this.size = json.size;
+    this.character = json.character;
+    this.tile = getTileByPosition(json.position_x, json.position_y);
+    this.id = json.id;
 
-    function getScale() {
-      switch(size) {
+    this.getScale = function() {
+      switch(this.size) {
         case 'L':
           return 2;
         case 'H':
@@ -151,23 +150,23 @@ var Map = function(json_arg, id_arg) {
       return 1;
     }
 
-    function moveToTile(target) {
-      tile = target;
+    this.moveToTile = function(target) {
+      this.tile = target;
     }
 
-    function inTile(target) {
-      var scale = getScale();
-      return target.x >= tile.x && target.x < tile.x + scale &&
-        target.y >= tile.y && target.y < tile.y + scale;
+    this.inTile = function(target) {
+      var scale = this.getScale();
+      return target.x >= this.tile.x && target.x < this.tile.x + scale &&
+        target.y >= this.tile.y && target.y < this.tile.y + scale;
     }
 
-    function draw() {
+    this.draw = function() {
       context.save();
       var offset = {
-        x: tile.x * tile_size,
-        y: tile.y * tile_size
+        x: this.tile.x * tile_size,
+        y: this.tile.y * tile_size
       }
-      var scaled = getScale() * tile_size;
+      var scaled = this.getScale() * tile_size;
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
       context.fillRect(offset.x, offset.y, scaled, scaled);
       context.textAlign = 'center';
@@ -186,16 +185,8 @@ var Map = function(json_arg, id_arg) {
       } else {
         context.fillStyle = 'rgba(0, 0, 0, 1)';
       }
-      context.fillText(character, center.x, center.y);
+      context.fillText(this.character, center.x, center.y);
       context.restore();
-    }
-
-    return {
-      id: id,
-      getScale: getScale,
-      draw: draw,
-      inTile: inTile,
-      moveToTile: moveToTile
     }
   }
 

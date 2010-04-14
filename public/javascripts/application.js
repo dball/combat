@@ -9,14 +9,14 @@ var Map = function(json_arg, id_arg) {
     canvas.width / json.width,
     canvas.height / json.height
   );
-  var figures = new Object();
-  for (var i=0; i < json.figures.length; i++) {
-    var figure = new Figure(json.figures[i]);
-    figures[figure.id] = figure;
+  var figures = [];
+  for (var i=0, l = json.figures.length; i < l; i++) {
+    figures.push(new Figure(json.figures[i]));
   }
   var selected = {
     figure: null,
-    tile: null
+    tile: null,
+    action: null
   }
   var cursor = {
     tile: null,
@@ -34,7 +34,7 @@ var Map = function(json_arg, id_arg) {
   }
 
   function drawCursor() {
-    if (cursor.tile != null && selected.figure != null) {
+    if (cursor.tile != null && (selected.figure != null || selected.action == 'c')) {
       context.save();
       context.fillStyle = 'rgba(255, 0, 0, 0.25)';
       var x = 1 + cursor.tile.x * tile_size;
@@ -65,8 +65,8 @@ var Map = function(json_arg, id_arg) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
     drawCursor();
-    for (var id in figures) {
-      figures[id].draw();
+    for (var i = 0, l = figures.length; i < l; i++) {
+      figures[i].draw();
     }
   }
 
@@ -102,6 +102,34 @@ var Map = function(json_arg, id_arg) {
     }
   }
 
+  function keypress(evt) {
+    if (selected.tile != null && selected.figure == null) {
+      var character = String.fromCharCode(evt.charCode);
+      switch(selected.action) {
+        case null:
+          switch(character) {
+            case 'c':
+              selected.action = 'c';
+              draw();
+              break;
+            default:
+              selected.action = null;
+          }
+          break;
+        case 'c':
+          figures.push(new Figure({
+            position_x: cursor.tile.x,
+            position_y: cursor.tile.y,
+            character: character,
+            size: 'M'
+          }));
+          selected.action = null;
+          draw();
+          break;
+      }
+    }
+  }
+
   function mousemove(evt) {
     tile = getTileByPixel(evt.pageX, evt.pageY);
     if (tile != cursor.tile) {
@@ -118,13 +146,11 @@ var Map = function(json_arg, id_arg) {
 
     this.getFigures = function() {
       var results = [];
-      for (var id in figures) {
-        var figure = figures[id];
+      for (var i=0, l=figures.length; i < l; i++) {
+        var figure = figures[i];
         if (figure.inTile(this)) {
           results.push(figure);
         }
-      }
-      if (results.length > 1) {
       }
       return results;
     }
@@ -195,6 +221,7 @@ var Map = function(json_arg, id_arg) {
     $(selector)
       .click(click)
       .mousemove(mousemove);
+    $(document).keypress(keypress);
   }
 
   return {

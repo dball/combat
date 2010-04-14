@@ -38,7 +38,7 @@ var Map = function(json_arg, id_arg) {
   }
 
   function drawCursor() {
-    if (cursor.tile != null) {
+    if (cursor.tile != null && selected_figure != null) {
       context.save();
       context.fillStyle = 'rgba(255, 0, 0, 0.25)';
       var x = 1 + cursor.tile.x * tile_size;

@@ -129,6 +129,31 @@ var Map = function(json_arg, id_arg) {
           draw();
           break;
       }
+    } else if (selected.figure != null) {
+      switch(evt.keyCode) {
+        case KeyEvent.DOM_VK_BACK_SPACE:
+          var index = null;
+          for (var i=0, l=figures.length; i < l; i++) {
+            if (figures[i] == selected.figure) {
+              index = i;
+              break;
+            }
+          }
+          if (index == null) {
+            throw 'Selected figure does not exist';
+          }
+          figures.splice(index, 1);
+          selected.figure.destroy();
+          selected.figure = null;
+          cursor.size = 1;
+          draw();
+          break;
+        case KeyEvent.DOM_VK_ESCAPE:
+          selected.figure = null;
+          cursor.size = 1;
+          draw();
+          break;
+      }
     }
   }
 
@@ -178,9 +203,7 @@ var Map = function(json_arg, id_arg) {
           url: window.location.href + "/figures",
           data: data,
           success: function(results) {
-            console.log("saving figure", figure);
             figure.id = results.id;
-            console.log("saved figure", figure);
           }
         });
       } else {
@@ -190,6 +213,13 @@ var Map = function(json_arg, id_arg) {
           data: data
         });
       }
+    }
+
+    this.destroy = function() {
+      $.ajax({
+        type: 'DELETE',
+        url: window.location.href + "/figures/" + this.id
+      });
     }
 
     this.getScale = function() {

@@ -14,7 +14,10 @@ var Map = function(json_arg, id_arg) {
     var figure = new Figure(json.figures[i]);
     figures[figure.id] = figure;
   }
-  var selected_figure;
+  var selected = {
+    figure: null,
+    tile: null
+  }
   var cursor = {
     tile: null,
     size: 1
@@ -38,7 +41,7 @@ var Map = function(json_arg, id_arg) {
   }
 
   function drawCursor() {
-    if (cursor.tile != null && selected_figure != null) {
+    if (cursor.tile != null && selected.figure != null) {
       context.save();
       context.fillStyle = 'rgba(255, 0, 0, 0.25)';
       var x = 1 + cursor.tile.x * tile_size;
@@ -77,10 +80,10 @@ var Map = function(json_arg, id_arg) {
   /* Event handlers */
 
   function click(evt) {
-    tile = getTileByPixel(evt.pageX, evt.pageY);
-    if (selected_figure) {
-      selected_figure.moveToTile(tile);
-      selected_figure = null;
+    tile = selected.tile = getTileByPixel(evt.pageX, evt.pageY);
+    if (selected.figure) {
+      selected.figure.moveToTile(tile);
+      selected.figure = null;
       cursor.size = 1;
       draw();
       return;
@@ -88,19 +91,19 @@ var Map = function(json_arg, id_arg) {
     for (var id in figures) {
       var figure = figures[id];
       if (figure.inTile(tile)) {
-        if (figure == selected_figure) {
-          selected_figure = null;
+        if (figure == selected.figure) {
+          selected.figure = null;
           cursor.size = 1;
         } else {
-          selected_figure = figure;
+          selected.figure = figure;
           cursor.size = figure.getScale();
         }
         draw();
         return;
       }
     }
-    if (selected_figure != null) {
-      selected_figure = null;
+    if (selected.figure != null) {
+      selected.figure = null;
       draw();
     }
   }
@@ -161,7 +164,7 @@ var Map = function(json_arg, id_arg) {
         x: scaled / 2 + offset.x,
         y: scaled / 2 + offset.y
       }
-      if (this == selected_figure) {
+      if (this == selected.figure) {
         context.fillStyle = 'rgba(0, 0, 255, 1)'
         context.shadowOffsetX = 2;
         context.shadowOffsetY = 2;

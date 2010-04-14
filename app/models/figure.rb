@@ -5,5 +5,5 @@ class Figure < ActiveRecord::Base
 
   validates_numericality_of :position_x
   validates_numericality_of :position_y
-  validates_inclusion_of :size, :in => SIZES.map {|s| s[0, 1] }
+  validates_inclusion_of :size, :in => SIZES.map {|s| s[0, 1].upcase }
 end

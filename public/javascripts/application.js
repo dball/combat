@@ -30,14 +30,7 @@ var Map = function(json_arg, id_arg) {
   function getTileByPosition(x, y) {
     var key = '' + x + ',' + y;
     var tile = tiles[key];
-    if (tile != null) {
-      return tile;
-    } else {
-      return tiles[key] = {
-        x: x,
-        y: y
-      }
-    }
+    return (tile != null) ? tile : tiles[key] = new Tile(x, y);
   }
 
   function drawCursor() {
@@ -81,6 +74,7 @@ var Map = function(json_arg, id_arg) {
 
   function click(evt) {
     tile = selected.tile = getTileByPixel(evt.pageX, evt.pageY);
+    // release selected figure
     if (selected.figure) {
       selected.figure.moveToTile(tile);
       selected.figure = null;
@@ -88,19 +82,19 @@ var Map = function(json_arg, id_arg) {
       draw();
       return;
     }
-    for (var id in figures) {
-      var figure = figures[id];
-      if (figure.inTile(tile)) {
-        if (figure == selected.figure) {
-          selected.figure = null;
-          cursor.size = 1;
-        } else {
-          selected.figure = figure;
-          cursor.size = figure.getScale();
-        }
-        draw();
-        return;
+    // select a figure
+    var figures = tile.getFigures();
+    for (var i=0, l = figures.length; i < l; i++) {
+      var figure = figures[i];
+      if (figure == selected.figure) {
+        selected.figure = null;
+        cursor.size = 1;
+      } else {
+        selected.figure = figure;
+        cursor.size = figure.getScale();
       }
+      draw();
+      return;
     }
     if (selected.figure != null) {
       selected.figure = null;
@@ -117,6 +111,25 @@ var Map = function(json_arg, id_arg) {
   }
 
   /* Child models */
+
+  function Tile(x, y) {
+    this.x = x;
+    this.y = y;
+
+    this.getFigures = function() {
+      var results = [];
+      for (var id in figures) {
+        var figure = figures[id];
+        if (figure.inTile(this)) {
+          results.push(figure);
+        }
+      }
+      if (results.length > 1) {
+        console.log("tile contains multitudes", results);
+      }
+      return results;
+    }
+  }
 
   function Figure(json) {
     var size = json.size;

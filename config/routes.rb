@@ -5,7 +5,11 @@ Combat::Application.routes.draw do |map|
     member do
       get :latest
     end
-    resources :figures
+    resources :figures do
+      member do
+        post :enlarge, :reduce
+      end
+    end
   end
   # The priority is based upon order of creation:
   # first created -> highest priority.

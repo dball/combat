@@ -134,29 +134,41 @@ var Map = function(json_arg, id_arg) {
           break;
       }
     } else if (selected.figure != null) {
-      switch(evt.keyCode) {
-        case KeyEvent.DOM_VK_BACK_SPACE:
-          var index = null;
-          for (var i=0, l=figures.length; i < l; i++) {
-            if (figures[i] == selected.figure) {
-              index = i;
-              break;
+      if (evt.keyCode != 0) {
+        switch(evt.keyCode) {
+          case KeyEvent.DOM_VK_BACK_SPACE:
+            var index = null;
+            for (var i=0, l=figures.length; i < l; i++) {
+              if (figures[i] == selected.figure) {
+                index = i;
+                break;
+              }
             }
-          }
-          if (index == null) {
-            throw 'Selected figure does not exist';
-          }
-          figures.splice(index, 1);
-          selected.figure.destroy();
-          selected.figure = null;
-          cursor.size = 1;
-          draw();
-          break;
-        case KeyEvent.DOM_VK_ESCAPE:
-          selected.figure = null;
-          cursor.size = 1;
-          draw();
-          break;
+            if (index == null) {
+              throw 'Selected figure does not exist';
+            }
+            figures.splice(index, 1);
+            selected.figure.destroy();
+            selected.figure = null;
+            cursor.size = 1;
+            draw();
+            break;
+          case KeyEvent.DOM_VK_ESCAPE:
+            selected.figure = null;
+            cursor.size = 1;
+            draw();
+            break;
+        }
+      } else if (evt.charCode != 0) {
+        var character = String.fromCharCode(evt.charCode);
+        switch(character) {
+          case ']':
+            selected.figure.enlarge();
+            break;
+          case '[':
+            selected.figure.reduce();
+            break;
+        }
       }
     }
   }
@@ -219,6 +231,32 @@ var Map = function(json_arg, id_arg) {
           data: data
         });
       }
+    }
+
+    this.enlarge = function() {
+      var figure = this;
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/figures/" + this.id + "/enlarge",
+        success: function(results) {
+          figure.size = results.size;
+          cursor.size = figure.getScale();
+          draw();
+        }
+      });
+    }
+
+    this.reduce = function() {
+      var figure = this;
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/figures/" + this.id + "/reduce",
+        success: function(results) {
+          figure.size = results.size;
+          cursor.size = figure.getScale();
+          draw();
+        }
+      });
     }
 
     this.destroy = function() {

@@ -29,14 +29,47 @@ var Map = function(json_arg, id_arg) {
   var actions = {
     c: {
       title: 'Create figure',
+      character: null,
+      tile: null,
       keypress: function(evt) {
-        // store character for creation
-        // start drawing cursor
+        this.character = String.fromCharCode(evt.charCode);
       },
       click: function(evt) {
-        // create character on tile
+        var tile = getTileByPixel(evt.pageX, evt.pageY);
+        var figure = new Figure({
+          position_x: tile.x,
+          position_y: tile.y,
+          character: this.character,
+          size: 'M'
+        });
+        figure.save();
+        figures.push(figure);
+        draw();
       },
-      drawCursor: function(point) {
+      mousemove: function(evt) {
+        var tile = getTileByPixel(evt.pageX, evt.pageY);
+        if (tile != this.tile) {
+          this.tile = tile;
+          if (this.character) {
+            draw();
+          }
+        }
+      },
+      cancel: function() {
+        if (this.character) {
+          draw();
+        }
+      },
+      draw: function() {
+        context.save();
+        context.fillStyle = 'rgba(255, 0, 0, 0.25)';
+        context.fillRect(
+          1 + this.tile.x * tile_size,
+          1 + this.tile.y * tile_size,
+          tile_size - 1,
+          tile_size - 1
+        );
+        context.restore();
       }
     },
     d: {
@@ -54,10 +87,93 @@ var Map = function(json_arg, id_arg) {
     },
     click: {
       title: 'select figure',
-      click: function(evt) {
-        // either select another figure or move the selected figure
+      index: null,
+      figures: [],
+      tiles: {
+        start: null,
+        current: null
       },
-      drawCursor: function(point) {
+      getFigure: function() {
+        return this.index != null ? this.figures[this.index] : null;
+      },
+      nextFigure: function() {
+        var length = this.figures.length;
+        if (length == 0) {
+          this.cancel();
+        } else if (this.index == null) {
+          this.index = 0;
+        } else if (this.index < length - 1) {
+          this.index += 1;
+        } else {
+          this.cancel();
+        }
+      },
+      click: function(evt) {
+        this.tiles.current = getTileByPixel(evt.pageX, evt.pageY);
+        if (this.tiles.start == null) {
+          this.tiles.start = this.tiles.current;
+          this.figures = this.tiles.start.getFigures();
+          this.nextFigure();
+        } else if (this.tiles.start == this.tiles.current) {
+          this.nextFigure();
+          if (this.getFigure() == null) {
+            this.cancel();
+          }
+        } else {
+          this.getFigure().moveToTile(this.tiles.current);
+          this.cancel();
+        }
+        draw();
+      },
+      mousemove: function(evt) {
+        this.tiles.current = getTileByPixel(evt.pageX, evt.pageY);
+        if (this.getFigure() != null) {
+          draw();
+        }
+      },
+      keypress: function(evt) {
+        var figure = this.getFigure();
+        if (figure != null && evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
+          var index = null;
+          for (var i=0, l=figures.length; i < l; i++) {
+            if (figures[i] == figure) {
+              index = i;
+              break;
+            }
+          }
+          if (index == null) {
+            throw 'Selected figure does not exist';
+          }
+          figure.destroy();
+          figures.splice(index, 1);
+          this.cancel();
+          return;
+        }
+        this.cancel();
+        keypress(evt);
+      },
+      cancel: function() {
+        this.index = null;
+        this.figures = [];
+        this.tiles.current = null;
+        this.tiles.start = null;
+        selected.action = null;
+        draw();
+      },
+      draw: function() {
+        var figure = this.getFigure();
+        if (figure != null) {
+          context.save();
+          context.fillStyle = 'rgba(255, 0, 0, 0.25)';
+          var tile = this.tiles.current;
+          context.fillRect(
+            1 + tile.x * tile_size,
+            1 + tile.y * tile_size,
+            (tile_size - 1) * figure.getScale(),
+            (tile_size - 1) * figure.getScale()
+          );
+          context.restore();
+        }
       }
     }
   }
@@ -73,23 +189,6 @@ var Map = function(json_arg, id_arg) {
     var key = '' + x + ',' + y;
     var tile = tiles[key];
     return (tile != null) ? tile : tiles[key] = new Tile(x, y);
-  }
-
-  function shouldDrawCursor() {
-    return (cursor.tile != null && (selected.figure != null || selected.action != null));
-  }
-
-  function drawCursor() {
-    if (shouldDrawCursor()) {
-      context.save();
-      context.fillStyle = 'rgba(255, 0, 0, 0.25)';
-      var x = 1 + cursor.tile.x * tile_size;
-      var y = 1 + cursor.tile.y * tile_size;
-      var w = (tile_size - 1) * cursor.size;
-      var h = (tile_size - 1) * cursor.size;
-      context.fillRect(x, y, w, h);
-      context.restore();
-    }
   }
 
   function drawGrid() {
@@ -110,26 +209,24 @@ var Map = function(json_arg, id_arg) {
   function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
-    drawCursor();
     for (var i=0, l=figures.length; i < l; i++) {
       figures[i].draw();
     }
     for (var i=0, l=walls.length; i < l; i++) {
       walls[i].draw();
     }
+    if (selected.action != null) {
+      selected.action.draw();
+    }
   }
 
   /* Event handlers */
 
-  function click(evt) {
+  function oldclick(evt) {
     var last_selected_tile = selected.tile;
     tile = selected.tile = getTileByPixel(evt.pageX, evt.pageY);
     // release selected figure
     if (selected.figure) {
-      selected.figure.moveToTile(tile);
-      selected.figure = null;
-      cursor.size = 1;
-      draw();
       return;
     }
     if (selected.action == 'd' && last_selected_tile != null) {
@@ -145,26 +242,9 @@ var Map = function(json_arg, id_arg) {
       return;
     }
     // select a figure
-    var figures = tile.getFigures();
-    for (var i=0, l = figures.length; i < l; i++) {
-      var figure = figures[i];
-      if (figure == selected.figure) {
-        selected.figure = null;
-        cursor.size = 1;
-      } else {
-        selected.figure = figure;
-        cursor.size = figure.getScale();
-      }
-      draw();
-      return;
-    }
-    if (selected.figure != null) {
-      selected.figure = null;
-      draw();
-    }
   }
 
-  function keypress(evt) {
+  function oldkeypress(evt) {
     if (selected.tile != null && selected.figure == null) {
       var character = String.fromCharCode(evt.charCode);
       switch(selected.action) {
@@ -233,13 +313,45 @@ var Map = function(json_arg, id_arg) {
     }
   }
 
-  function mousemove(evt) {
+  function oldmousemove(evt) {
     tile = getTileByPixel(evt.pageX, evt.pageY);
     if (tile != cursor.tile) {
       cursor.tile = tile;
       if (shouldDrawCursor()) {
         draw();
       }
+    }
+  }
+
+  function click(evt) {
+    if (selected.action != null) {
+      selected.action.click(evt);
+    } else if (actions.click != null) {
+      selected.action = actions.click;
+      selected.action.click(evt);
+    }
+  }
+
+  function keypress(evt) {
+    evt.preventDefault();
+    if (selected.action != null) {
+      if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
+        action = selected.action;
+        selected.action = null;
+        action.cancel();
+      } else {
+        selected.action.keypress(evt);
+      }
+    } else {
+      if (evt.charCode != 0) {
+        selected.action = actions[String.fromCharCode(evt.charCode)];
+      }
+    }
+  }
+
+  function mousemove(evt) {
+    if (selected.action != null) {
+      selected.action.mousemove(evt);
     }
   }
 

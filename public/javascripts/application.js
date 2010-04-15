@@ -13,6 +13,10 @@ var Map = function(json_arg, id_arg) {
   for (var i=0, l = json.figures.length; i < l; i++) {
     figures.push(new Figure(json.figures[i]));
   }
+  var walls = [];
+  for (var i=0, l = json.walls.length; i < l; i++) {
+    walls.push(new Wall(json.walls[i]));
+  }
   var selected = {
     figure: null,
     tile: null,
@@ -28,13 +32,16 @@ var Map = function(json_arg, id_arg) {
   }
 
   function getTileByPosition(x, y) {
+    if (x == null || y == null) {
+      throw 'Invalid tile position ' + x + ',' + y;
+    }
     var key = '' + x + ',' + y;
     var tile = tiles[key];
     return (tile != null) ? tile : tiles[key] = new Tile(x, y);
   }
 
   function shouldDrawCursor() {
-    return (cursor.tile != null && (selected.figure != null || selected.action == 'c'));
+    return (cursor.tile != null && (selected.figure != null || selected.action != null));
   }
 
   function drawCursor() {
@@ -69,20 +76,36 @@ var Map = function(json_arg, id_arg) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
     drawCursor();
-    for (var i = 0, l = figures.length; i < l; i++) {
+    for (var i=0, l=figures.length; i < l; i++) {
       figures[i].draw();
+    }
+    for (var i=0, l=walls.length; i < l; i++) {
+      walls[i].draw();
     }
   }
 
   /* Event handlers */
 
   function click(evt) {
+    var last_selected_tile = selected.tile;
     tile = selected.tile = getTileByPixel(evt.pageX, evt.pageY);
     // release selected figure
     if (selected.figure) {
       selected.figure.moveToTile(tile);
       selected.figure = null;
       cursor.size = 1;
+      draw();
+      return;
+    }
+    if (selected.action == 'd' && last_selected_tile != null) {
+      var wall = new Wall({
+        x0: last_selected_tile.x,
+        y0: last_selected_tile.y,
+        x1: selected.tile.x,
+        y1: selected.tile.y
+      });
+      wall.save();
+      walls.push(wall);
       draw();
       return;
     }
@@ -113,7 +136,8 @@ var Map = function(json_arg, id_arg) {
         case null:
           switch(character) {
             case 'c':
-              selected.action = 'c';
+            case 'd':
+              selected.action = character;
               draw();
               break;
             default:
@@ -154,6 +178,7 @@ var Map = function(json_arg, id_arg) {
             draw();
             break;
           case KeyEvent.DOM_VK_ESCAPE:
+            selected.action = null;
             selected.figure = null;
             cursor.size = 1;
             draw();
@@ -198,6 +223,25 @@ var Map = function(json_arg, id_arg) {
         }
       }
       return results;
+    }
+  }
+
+  function Wall(json) {
+    this.tile0 = getTileByPosition(json.x0, json.y0);
+    this.tile1 = getTileByPosition(json.x1, json.y1);
+    this.id = json.id;
+
+    this.save = function() {}
+
+    this.draw = function() {
+      context.save();
+      context.beginPath();
+      context.moveTo(this.tile0.x * tile_size, this.tile0.y * tile_size);
+      context.lineTo(this.tile1.x * tile_size, this.tile1.y * tile_size);
+      context.lineWidth = tile_size / 4;
+      context.lineCap = 'butt';
+      context.stroke();
+      context.restore();
     }
   }
 

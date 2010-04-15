@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100412193915) do
+ActiveRecord::Schema.define(:version => 20100415031027) do
 
   create_table "figures", :force => true do |t|
     t.integer "map_id",                                   :null => false
@@ -27,5 +27,15 @@ ActiveRecord::Schema.define(:version => 20100412193915) do
     t.integer "width"
     t.integer "height"
   end
+
+  create_table "walls", :force => true do |t|
+    t.integer "map_id", :null => false
+    t.integer "x0",     :null => false
+    t.integer "y0",     :null => false
+    t.integer "x1",     :null => false
+    t.integer "y1",     :null => false
+  end
+
+  add_index "walls", ["map_id"], :name => "index_walls_on_map_id"
 
 end

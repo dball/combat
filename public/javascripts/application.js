@@ -26,6 +26,41 @@ var Map = function(json_arg, id_arg) {
     tile: null,
     size: 1
   }
+  var actions = {
+    c: {
+      title: 'Create figure',
+      keypress: function(evt) {
+        // store character for creation
+        // start drawing cursor
+      },
+      click: function(evt) {
+        // create character on tile
+      },
+      drawCursor: function(point) {
+      }
+    },
+    d: {
+      title: 'Draw wall',
+      keypress: function(evt) {},
+      click: function(evt) {
+        // add a point to the wall
+        // start drawing cursor
+      },
+      drawCursor: function(point) {
+      }
+    },
+    e: {
+      title: 'create Effect'
+    },
+    click: {
+      title: 'select figure',
+      click: function(evt) {
+        // either select another figure or move the selected figure
+      },
+      drawCursor: function(point) {
+      }
+    }
+  }
 
   function getTileByPixel(x, y) {
     return getTileByPosition(Math.floor(x / tile_size), Math.floor(y / tile_size));

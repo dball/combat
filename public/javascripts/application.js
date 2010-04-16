@@ -74,12 +74,44 @@ var Map = function(json_arg, id_arg) {
     },
     d: {
       title: 'Draw wall',
-      keypress: function(evt) {},
-      click: function(evt) {
-        // add a point to the wall
-        // start drawing cursor
+      wall: new Wall(),
+      vertex: null,
+      keypress: function(evt) {
+        if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
+          this.wall.destroy();
+        }
       },
-      drawCursor: function(point) {
+      click: function(evt) {
+        var vertex = getIntersectionByPixel(evt.pageX, evt.pageY);
+        this.wall.vertices.push(vertex);
+        draw();
+        this.draw();
+      },
+      mousemove: function(evt) {
+        var length = this.wall.vertices.length;
+        if (length > 0) {
+          var vertex = getIntersectionByPixel(evt.pageX, evt.pageY);
+          if (vertex != this.vertex) {
+            this.vertex = vertex;
+            draw();
+            this.draw();
+          }
+        }
+      },
+      cancel: function() {
+        if (this.wall.vertices.length > 1) {
+          this.wall.save();
+        }
+        this.wall = new Wall();
+        this.vertex = null;
+        draw();
+      },
+      draw: function() {
+        if (this.vertex != null) {
+          this.wall.vertices.push(this.vertex);
+          this.wall.draw();
+          this.wall.vertices.pop();
+        }
       }
     },
     e: {
@@ -180,6 +212,10 @@ var Map = function(json_arg, id_arg) {
 
   function getTileByPixel(x, y) {
     return getTileByPosition(Math.floor(x / tile_size), Math.floor(y / tile_size));
+  }
+
+  function getIntersectionByPixel(x, y) {
+    return getTileByPixel(x + tile_size / 2, y + tile_size / 2);
   }
 
   function getTileByPosition(x, y) {
@@ -374,21 +410,62 @@ var Map = function(json_arg, id_arg) {
   }
 
   function Wall(json) {
-    this.tile0 = getTileByPosition(json.x0, json.y0);
-    this.tile1 = getTileByPosition(json.x1, json.y1);
-    this.id = json.id;
+    this.vertices = [];
+    if (json == null) {
+      this.id = null;
+    } else {
+      this.id = json.id;
+      var vertex;
+      for (var i=0, l=json.vertices.length; i < l; i++) {
+        vertex = json.vertices[i];
+        this.vertices.push(getTileByPosition(vertex.x, vertex.y));
+      }
+    }
 
-    this.save = function() {}
+    this.save = function() {
+      walls.push(this);
+      var vertex;
+      var xy = [];
+      for (var i=0, l=this.vertices.length; i < l; i++) {
+        vertex = this.vertices[i];
+        xy.push('' + vertex.x + ',' + vertex.y);
+      }
+      data = {
+        'xy[]': xy,
+      }
+      if (this.id == null) {
+        var wall = this;
+        $.ajax({
+          type: 'POST',
+          url: window.location.href + "/walls",
+          data: data,
+          success: function(results) {
+            wall.id = results.id;
+          }
+        });
+      } else {
+        $.ajax({
+          type: 'PUT',
+          url: window.location.href + "/walls/" + this.id,
+          data: data
+        });
+      }
+    }
 
     this.draw = function() {
-      context.save();
-      context.beginPath();
-      context.moveTo(this.tile0.x * tile_size, this.tile0.y * tile_size);
-      context.lineTo(this.tile1.x * tile_size, this.tile1.y * tile_size);
-      context.lineWidth = tile_size / 4;
-      context.lineCap = 'butt';
-      context.stroke();
-      context.restore();
+      if (this.vertices.length > 1) {
+        context.save();
+        context.beginPath();
+        var vertex = this.vertices[0];
+        context.moveTo(vertex.x * tile_size, vertex.y * tile_size);
+        for (var i=1, l=this.vertices.length; i < l; i++) {
+          vertex = this.vertices[i];
+          context.lineTo(vertex.x * tile_size, vertex.y * tile_size);
+        }
+        context.lineWidth = tile_size / 4;
+        context.stroke();
+        context.restore();
+      }
     }
   }
 

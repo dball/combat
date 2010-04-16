@@ -1,7 +1,7 @@
 class MapsController < ApplicationController
   def show
     @map = Map.find(params[:id])
-    @json = @map.to_json(:include => [:figures, :walls])
+    @json = @map.to_json(:include => { :figures => {}, :walls => { :include => :vertices } })
   end
 
   def latest

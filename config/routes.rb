@@ -10,6 +10,7 @@ Combat::Application.routes.draw do |map|
         post :enlarge, :reduce
       end
     end
+    resources :walls
   end
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -23,17 +23,17 @@ var Map = function(json_arg, id_arg) {
   var actions = {
     c: {
       title: 'Create figure',
-      character: null,
+      letter: null,
       tile: null,
       keypress: function(evt) {
-        this.character = String.fromCharCode(evt.charCode);
+        this.letter = String.fromCharCode(evt.charCode);
       },
       click: function(evt) {
         var tile = getTileByPixel(evt.pageX, evt.pageY);
         var figure = new Figure({
           position_x: tile.x,
           position_y: tile.y,
-          character: this.character,
+          letter: this.letter,
           size: 'M'
         });
         figure.save();
@@ -44,13 +44,13 @@ var Map = function(json_arg, id_arg) {
         var tile = getTileByPixel(evt.pageX, evt.pageY);
         if (tile != this.tile) {
           this.tile = tile;
-          if (this.character) {
+          if (this.letter) {
             draw();
           }
         }
       },
       cancel: function() {
-        if (this.character) {
+        if (this.letter) {
           draw();
         }
       },
@@ -176,8 +176,8 @@ var Map = function(json_arg, id_arg) {
             this.cancel();
             return;
           } else if (evt.charCode != 0) {
-            var character = String.fromCharCode(evt.charCode);
-            switch(character) {
+            var key = String.fromCharCode(evt.charCode);
+            switch(key) {
               case ']':
                 figure.enlarge();
                 draw();
@@ -386,13 +386,13 @@ var Map = function(json_arg, id_arg) {
 
   function Figure(json) {
     this.size = json.size;
-    this.character = json.character;
+    this.letter = json.letter;
     this.tile = getTileByPosition(json.position_x, json.position_y);
     this.id = json.id;
 
     this.save = function() {
       var data = {
-        'figure[character]': this.character,
+        'figure[letter]': this.letter,
         'figure[size]': this.size,
         'figure[position_x]': this.tile.x,
         'figure[position_y]': this.tile.y
@@ -489,7 +489,7 @@ var Map = function(json_arg, id_arg) {
         y: scaled / 2 + offset.y
       }
       context.fillStyle = 'rgba(0, 0, 0, 1)';
-      context.fillText(this.character, center.x, center.y);
+      context.fillText(this.letter, center.x, center.y);
       context.restore();
     }
   }

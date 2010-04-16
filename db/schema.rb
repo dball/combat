@@ -9,13 +9,13 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416041454) do
+ActiveRecord::Schema.define(:version => 20100416204417) do
 
   create_table "figures", :force => true do |t|
     t.integer "map_id",                                   :null => false
     t.integer "position_x"
     t.integer "position_y"
-    t.string  "character",  :limit => 1,                  :null => false
+    t.string  "letter",     :limit => 1,                  :null => false
     t.string  "size",       :limit => 1, :default => "M", :null => false
   end
 

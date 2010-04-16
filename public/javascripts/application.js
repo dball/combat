@@ -18,13 +18,7 @@ var Map = function(json_arg, id_arg) {
     walls.push(new Wall(json.walls[i]));
   }
   var selected = {
-    figure: null,
-    tile: null,
     action: null
-  }
-  var cursor = {
-    tile: null,
-    size: 1
   }
   var actions = {
     c: {
@@ -180,6 +174,19 @@ var Map = function(json_arg, id_arg) {
           figures.splice(index, 1);
           this.cancel();
           return;
+          /*
+      } else if (evt.charCode != 0) {
+        var character = String.fromCharCode(evt.charCode);
+        switch(character) {
+          case ']':
+            selected.figure.enlarge();
+            break;
+          case '[':
+            selected.figure.reduce();
+            break;
+        }
+      }
+      */
         }
         this.cancel();
         keypress(evt);
@@ -205,6 +212,14 @@ var Map = function(json_arg, id_arg) {
             (tile_size - 1) * figure.getScale()
           );
           context.restore();
+          /*
+          // highlighted character
+          context.fillStyle = 'rgba(0, 0, 255, 1)'
+          context.shadowOffsetX = 2;
+          context.shadowOffsetY = 2;
+          context.shadowBlur = 1;
+          context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+          */
         }
       }
     }
@@ -257,107 +272,6 @@ var Map = function(json_arg, id_arg) {
   }
 
   /* Event handlers */
-
-  function oldclick(evt) {
-    var last_selected_tile = selected.tile;
-    tile = selected.tile = getTileByPixel(evt.pageX, evt.pageY);
-    // release selected figure
-    if (selected.figure) {
-      return;
-    }
-    if (selected.action == 'd' && last_selected_tile != null) {
-      var wall = new Wall({
-        x0: last_selected_tile.x,
-        y0: last_selected_tile.y,
-        x1: selected.tile.x,
-        y1: selected.tile.y
-      });
-      wall.save();
-      walls.push(wall);
-      draw();
-      return;
-    }
-    // select a figure
-  }
-
-  function oldkeypress(evt) {
-    if (selected.tile != null && selected.figure == null) {
-      var character = String.fromCharCode(evt.charCode);
-      switch(selected.action) {
-        case null:
-          switch(character) {
-            case 'c':
-            case 'd':
-              selected.action = character;
-              draw();
-              break;
-            default:
-              selected.action = null;
-          }
-          break;
-        case 'c':
-          var figure = new Figure({
-            position_x: cursor.tile.x,
-            position_y: cursor.tile.y,
-            character: character,
-            size: 'M'
-          });
-          figure.save();
-          figures.push(figure);
-          selected.action = null;
-          draw();
-          break;
-      }
-    } else if (selected.figure != null) {
-      if (evt.keyCode != 0) {
-        switch(evt.keyCode) {
-          case KeyEvent.DOM_VK_BACK_SPACE:
-            var index = null;
-            for (var i=0, l=figures.length; i < l; i++) {
-              if (figures[i] == selected.figure) {
-                index = i;
-                break;
-              }
-            }
-            if (index == null) {
-              throw 'Selected figure does not exist';
-            }
-            figures.splice(index, 1);
-            selected.figure.destroy();
-            selected.figure = null;
-            cursor.size = 1;
-            draw();
-            break;
-          case KeyEvent.DOM_VK_ESCAPE:
-            selected.action = null;
-            selected.figure = null;
-            cursor.size = 1;
-            draw();
-            break;
-        }
-      } else if (evt.charCode != 0) {
-        var character = String.fromCharCode(evt.charCode);
-        switch(character) {
-          case ']':
-            selected.figure.enlarge();
-            break;
-          case '[':
-            selected.figure.reduce();
-            break;
-        }
-      }
-    }
-  }
-
-  function oldmousemove(evt) {
-    tile = getTileByPixel(evt.pageX, evt.pageY);
-    if (tile != cursor.tile) {
-      cursor.tile = tile;
-      if (shouldDrawCursor()) {
-        draw();
-      }
-    }
-  }
 
   function click(evt) {
     if (selected.action != null) {
@@ -508,7 +422,6 @@ var Map = function(json_arg, id_arg) {
         url: window.location.href + "/figures/" + this.id + "/enlarge",
         success: function(results) {
           figure.size = results.size;
-          cursor.size = figure.getScale();
           draw();
         }
       });
@@ -521,7 +434,6 @@ var Map = function(json_arg, id_arg) {
         url: window.location.href + "/figures/" + this.id + "/reduce",
         success: function(results) {
           figure.size = results.size;
-          cursor.size = figure.getScale();
           draw();
         }
       });
@@ -575,15 +487,7 @@ var Map = function(json_arg, id_arg) {
         x: scaled / 2 + offset.x,
         y: scaled / 2 + offset.y
       }
-      if (this == selected.figure) {
-        context.fillStyle = 'rgba(0, 0, 255, 1)'
-        context.shadowOffsetX = 2;
-        context.shadowOffsetY = 2;
-        context.shadowBlur = 1;
-        context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      } else {
-        context.fillStyle = 'rgba(0, 0, 0, 1)';
-      }
+      context.fillStyle = 'rgba(0, 0, 0, 1)';
       context.fillText(this.character, center.x, center.y);
       context.restore();
     }

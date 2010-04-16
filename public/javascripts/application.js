@@ -159,34 +159,35 @@ var Map = function(json_arg, id_arg) {
       },
       keypress: function(evt) {
         var figure = this.getFigure();
-        if (figure != null && evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-          var index = null;
-          for (var i=0, l=figures.length; i < l; i++) {
-            if (figures[i] == figure) {
-              index = i;
-              break;
+        if (figure != null) {
+          if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
+            var index = null;
+            for (var i=0, l=figures.length; i < l; i++) {
+              if (figures[i] == figure) {
+                index = i;
+                break;
+              }
+            }
+            if (index == null) {
+              throw 'Selected figure does not exist';
+            }
+            figure.destroy();
+            figures.splice(index, 1);
+            this.cancel();
+            return;
+          } else if (evt.charCode != 0) {
+            var character = String.fromCharCode(evt.charCode);
+            switch(character) {
+              case ']':
+                figure.enlarge();
+                draw();
+                return;
+              case '[':
+                figure.reduce();
+                draw();
+                return;
             }
           }
-          if (index == null) {
-            throw 'Selected figure does not exist';
-          }
-          figure.destroy();
-          figures.splice(index, 1);
-          this.cancel();
-          return;
-          /*
-      } else if (evt.charCode != 0) {
-        var character = String.fromCharCode(evt.charCode);
-        switch(character) {
-          case ']':
-            selected.figure.enlarge();
-            break;
-          case '[':
-            selected.figure.reduce();
-            break;
-        }
-      }
-      */
         }
         this.cancel();
         keypress(evt);

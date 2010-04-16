@@ -9,16 +9,23 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416204417) do
+ActiveRecord::Schema.define(:version => 20100416211128) do
 
-  create_table "figures", :force => true do |t|
-    t.integer "map_id",                                   :null => false
-    t.integer "position_x"
-    t.integer "position_y"
-    t.string  "letter",     :limit => 1,                  :null => false
-    t.string  "size",       :limit => 1, :default => "M", :null => false
+  create_table "characters", :force => true do |t|
+    t.string "letter", :limit => 1,                  :null => false
+    t.string "size",   :limit => 1, :default => "M"
   end
 
+  create_table "figures", :force => true do |t|
+    t.integer "map_id",                                     :null => false
+    t.integer "position_x"
+    t.integer "position_y"
+    t.string  "letter",       :limit => 1,                  :null => false
+    t.string  "size",         :limit => 1, :default => "M", :null => false
+    t.integer "character_id"
+  end
+
+  add_index "figures", ["character_id"], :name => "index_figures_on_character_id"
   add_index "figures", ["map_id"], :name => "index_figures_on_map_id"
 
   create_table "maps", :force => true do |t|

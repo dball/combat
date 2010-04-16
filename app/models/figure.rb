@@ -3,6 +3,7 @@ class Figure < ActiveRecord::Base
   SIZE_CODES = SIZES.map {|s| s[0, 1].upcase }
 
   belongs_to :map
+  belongs_to :character
 
   validates_numericality_of :position_x
   validates_numericality_of :position_y

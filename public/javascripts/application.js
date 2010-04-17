@@ -25,6 +25,9 @@ var Map = function(json_arg, id_arg) {
       title: 'Create figure',
       letter: null,
       tile: null,
+      init: function(evt) {
+        this.mousemove(evt);
+      },
       keypress: function(evt) {
         this.letter = String.fromCharCode(evt.charCode);
       },
@@ -70,6 +73,9 @@ var Map = function(json_arg, id_arg) {
       title: 'Draw wall',
       wall: new Wall(),
       vertex: null,
+      init: function(evt) {
+        this.mousemove(evt);
+      },
       keypress: function(evt) {
         if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
           this.wall.destroy();
@@ -133,6 +139,8 @@ var Map = function(json_arg, id_arg) {
         } else {
           this.cancel();
         }
+      },
+      init: function(evt) {
       },
       click: function(evt) {
         this.tiles.current = getTileByPixel(evt.pageX, evt.pageY);
@@ -311,6 +319,14 @@ var Map = function(json_arg, id_arg) {
   function Tile(x, y) {
     this.x = x;
     this.y = y;
+    this.corner = {
+      x: x * tile_size,
+      y: y * tile_size
+    };
+    this.center = {
+      x: (x + 0.5) * tile_size,
+      y: (y + 0.5) * tile_size
+    }
 
     this.getFigures = function() {
       var results = [];
@@ -461,6 +477,10 @@ var Map = function(json_arg, id_arg) {
       return 1;
     }
 
+    this.getSize = function() {
+      return this.getScale() * tile_size;
+    }
+
     this.moveToTile = function(target) {
       this.tile = target;
       this.save();
@@ -472,23 +492,31 @@ var Map = function(json_arg, id_arg) {
         target.y >= this.tile.y && target.y < this.tile.y + scale;
     }
 
+    this.getCenter = function() {
+      var size = this.getSize();
+      return {
+        x: size / 2 + this.tile.corner.x,
+        y: size / 2 + this.tile.corner.y
+      }
+    }
+
     this.draw = function() {
       context.save();
-      var offset = {
-        x: this.tile.x * tile_size,
-        y: this.tile.y * tile_size
-      }
-      var scaled = this.getScale() * tile_size;
+      var size = this.getSize();
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
-      context.fillRect(offset.x, offset.y, scaled, scaled);
+      context.fillRect(this.tile.corner.x, this.tile.corner.y, size, size);
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.font = '' + scaled + 'px courier';
-      var center = {
-        x: scaled / 2 + offset.x,
-        y: scaled / 2 + offset.y
-      }
       context.fillStyle = 'rgba(0, 0, 0, 1)';
+      this.drawLetter(context);
+      context.restore();
+    }
+
+    this.drawLetter = function(context) {
+      context.save();
+      var size = this.getSize();
+      context.font = '' + size + 'px courier';
+      var center = this.getCenter();
       context.fillText(this.letter, center.x, center.y);
       context.restore();
     }

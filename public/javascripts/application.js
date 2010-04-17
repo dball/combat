@@ -214,21 +214,16 @@ var Map = function(json_arg, id_arg) {
           context.save();
           context.fillStyle = 'rgba(255, 0, 0, 0.25)';
           var tile = this.tiles.current;
-          context.fillRect(
-            1 + tile.x * tile_size,
-            1 + tile.y * tile_size,
-            (tile_size - 1) * figure.getScale(),
-            (tile_size - 1) * figure.getScale()
-          );
-          context.restore();
-          /*
-          // highlighted character
+          context.translate(tile.corner.x, tile.corner.y);
+          var size = figure.getSize() - 2;
+          context.fillRect(1, 1, size, size);
           context.fillStyle = 'rgba(0, 0, 255, 1)'
           context.shadowOffsetX = 2;
           context.shadowOffsetY = 2;
           context.shadowBlur = 1;
           context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-          */
+          figure.drawLetter(context);
+          context.restore();
         }
       }
     }
@@ -504,9 +499,8 @@ var Map = function(json_arg, id_arg) {
       context.save();
       var size = this.getSize();
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
-      context.fillRect(this.tile.corner.x, this.tile.corner.y, size, size);
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
+      context.translate(this.tile.corner.x, this.tile.corner.y);
+      context.fillRect(0, 0, size, size);
       context.fillStyle = 'rgba(0, 0, 0, 1)';
       this.drawLetter(context);
       context.restore();
@@ -515,9 +509,11 @@ var Map = function(json_arg, id_arg) {
     this.drawLetter = function(context) {
       context.save();
       var size = this.getSize();
+      var offset = size / 2;
       context.font = '' + size + 'px courier';
-      var center = this.getCenter();
-      context.fillText(this.letter, center.x, center.y);
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(this.letter, offset, offset);
       context.restore();
     }
   }

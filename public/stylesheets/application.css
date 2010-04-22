@@ -1,0 +1,14 @@
+#combat {
+  display: table;
+  width: 100%;
+}
+
+#combat #controls {
+  display: table-cell;
+  width: 12em;
+  vertical-align: top;
+}
+
+#combat #viewport {
+  display: table-cell;
+}

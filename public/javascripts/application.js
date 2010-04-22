@@ -1,26 +1,65 @@
-var Map = function(json_arg, id_arg) {
-  var json = json_arg;
-  var id = id_arg;
-  var selector = "#" + id;
+var Map = function(json, id, viewport_id) {
   var canvas = document.getElementById(id);
+  $(canvas).width($('#' + viewport_id).width());
+  $(canvas).height($('#' + viewport_id).height());
+  var url = window.location.href + "/../..";
   var context = canvas.getContext('2d');
-  var tiles = new Object();
-  var tile_size = Math.min(
-    canvas.width / json.width,
-    canvas.height / json.height
-  );
+  var scale = json.scale;
+  var viewport = {
+    x: json.x,
+    y: json.y
+  }
+  var width = 30;
+  var height = 20;
+  var tiles = {
+    size: Math.min(canvas.width / json.map.width, canvas.height / json.map.height) * scale
+  }
+  context.scale(tiles.size, tiles.size);
+  context.translate(-viewport.x, -viewport.y);
+
   var figures = [];
-  for (var i=0, l = json.figures.length; i < l; i++) {
-    figures.push(new Figure(json.figures[i]));
-  }
+  $.each(json.map.figures, function(i, figure) { figures.push(new Figure(figure)); });
+
   var walls = [];
-  for (var i=0, l = json.walls.length; i < l; i++) {
-    walls.push(new Wall(json.walls[i]));
-  }
-  var selected = {
-    action: null
-  }
+  $.each(json.map.walls, function(i, wall) { walls.push(new Wall(wall)); });
   var actions = {
+    selected: null,
+    ']': {
+      title: 'Zoom in',
+      init: function(evt) {
+        $.ajax({
+          type: 'POST',
+          url: window.location.href + "/zoom",
+          data: { direction: '+' },
+          success: function(results) {
+            ratio = results.scale / scale;
+            scale = results.scale;
+            tiles.size = tiles.size * ratio;
+            context.scale(ratio, ratio);
+            draw();
+          }
+        });
+        actions.selected = null;
+      }
+    },
+    '[': {
+      title: 'Zoom out',
+      init: function(evt) {
+        $.ajax({
+          type: 'POST',
+          url: window.location.href + "/zoom",
+          data: { direction: '-' },
+          success: function(results) {
+            ratio = results.scale / scale;
+            scale = results.scale;
+            tiles.size = tiles.size * ratio;
+            context.scale(ratio, ratio);
+            draw();
+          }
+        });
+        actions.selected = null;
+      }
+    },
     c: {
       title: 'Create figure',
       letter: null,
@@ -60,12 +99,7 @@ var Map = function(json_arg, id_arg) {
       draw: function() {
         context.save();
         context.fillStyle = 'rgba(255, 0, 0, 0.25)';
-        context.fillRect(
-          1 + this.tile.x * tile_size,
-          1 + this.tile.y * tile_size,
-          tile_size - 1,
-          tile_size - 1
-        );
+        context.fillRect(this.tile.x, this.tile.y, 1, 1);
         context.restore();
       }
     },
@@ -169,18 +203,7 @@ var Map = function(json_arg, id_arg) {
         var figure = this.getFigure();
         if (figure != null) {
           if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-            var index = null;
-            for (var i=0, l=figures.length; i < l; i++) {
-              if (figures[i] == figure) {
-                index = i;
-                break;
-              }
-            }
-            if (index == null) {
-              throw 'Selected figure does not exist';
-            }
             figure.destroy();
-            figures.splice(index, 1);
             this.cancel();
             return;
           } else if (evt.charCode != 0) {
@@ -205,7 +228,7 @@ var Map = function(json_arg, id_arg) {
         this.figures = [];
         this.tiles.current = null;
         this.tiles.start = null;
-        selected.action = null;
+        actions.selected = null;
         draw();
       },
       draw: function() {
@@ -215,8 +238,8 @@ var Map = function(json_arg, id_arg) {
           context.fillStyle = 'rgba(255, 0, 0, 0.25)';
           var tile = this.tiles.current;
           context.translate(tile.corner.x, tile.corner.y);
-          var size = figure.getSize() - 2;
-          context.fillRect(1, 1, size, size);
+          var size = figure.getSize();
+          context.fillRect(0, 0, size, size);
           context.fillStyle = 'rgba(0, 0, 255, 1)'
           context.shadowOffsetX = 2;
           context.shadowOffsetY = 2;
@@ -229,12 +252,98 @@ var Map = function(json_arg, id_arg) {
     }
   }
 
+  actions[KeyEvent.DOM_VK_LEFT] = {
+    init: function(evt) {
+      actions.selected = null;
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/pan",
+        data: { direction: '-', axis: 'x' },
+        success: function(results) {
+          context.translate(viewport.x - results.x, 0);
+          viewport.x = results.x;
+          draw();
+        }
+      });
+    }
+  }
+  actions[KeyEvent.DOM_VK_RIGHT] = {
+    init: function(evt) {
+      actions.selected = null;
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/pan",
+        data: { direction: '+', axis: 'x' },
+        success: function(results) {
+          context.translate(viewport.x - results.x, 0);
+          viewport.x = results.x;
+          draw();
+        }
+      });
+    }
+  }
+  actions[KeyEvent.DOM_VK_UP] = {
+    init: function(evt) {
+      actions.selected = null;
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/pan",
+        data: { direction: '-', axis: 'y' },
+        success: function(results) {
+          context.translate(0, viewport.y - results.y);
+          viewport.y = results.y;
+          draw();
+        }
+      });
+    }
+  }
+  actions[KeyEvent.DOM_VK_DOWN] = {
+    init: function(evt) {
+      actions.selected = null;
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/pan",
+        data: { direction: '+', axis: 'y' },
+        success: function(results) {
+          context.translate(0, viewport.y - results.y);
+          viewport.y = results.y;
+          draw();
+        }
+      });
+    }
+  }
+  actions['='] = {
+    title: 'reset viewport',
+    init: function(evt) {
+      actions.selected = null;
+      $.ajax({
+        type: 'PUT',
+        url: window.location.href,
+        data: {
+          'viewport[x]': 0,
+          'viewport[y]': 0,
+          'viewport[scale]': 1,
+        }
+      });
+      context.translate(viewport.x, viewport.y);
+      context.scale(1 / scale, 1 / scale);
+      viewport.x = 0;
+      viewport.y = 0;
+      scale = 1;
+      draw();
+    }
+  }
+
   function getTileByPixel(x, y) {
-    return getTileByPosition(Math.floor(x / tile_size), Math.floor(y / tile_size));
+    var position = $(canvas).position();
+    return getTileByPosition(
+      Math.floor(viewport.x + (x - position.left) / tiles.size),
+      Math.floor(viewport.y + (y - position.top) / tiles.size)
+    );
   }
 
   function getIntersectionByPixel(x, y) {
-    return getTileByPixel(x + tile_size / 2, y + tile_size / 2);
+    return getTileByPixel(x + tiles.size / 2, y + tiles.size / 2);
   }
 
   function getTileByPosition(x, y) {
@@ -249,63 +358,70 @@ var Map = function(json_arg, id_arg) {
   function drawGrid() {
     context.save();
     context.beginPath();
-    for (var x=0.5; x < canvas.width; x += tile_size) {
-      context.moveTo(x, 0.5);
-      context.lineTo(x, canvas.height);
+    for (var i=0; i < width; i++) {
+      context.moveTo(i, 0);
+      context.lineTo(i, height);
     }
-    for (var y=0.5; y < canvas.height; y += tile_size) {
-      context.moveTo(0.5, y);
-      context.lineTo(canvas.width, y);
+    for (var i=0; i < height; i++) {
+      context.moveTo(0, i);
+      context.lineTo(width, i);
     }
+    context.lineWidth = 0.025;
+    context.strokeStyle = 'rgba(200, 200, 200, 1)';
     context.stroke();
     context.restore();
   }
 
   function draw() {
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, canvas.width, canvas.height);
+    context.restore();
     drawGrid();
-    for (var i=0, l=figures.length; i < l; i++) {
-      figures[i].draw();
-    }
-    for (var i=0, l=walls.length; i < l; i++) {
-      walls[i].draw();
-    }
-    if (selected.action != null) {
-      selected.action.draw();
+    $.each(figures, function(i, figure) { figure.draw(); });
+    $.each(walls, function(i, wall) { wall.draw(); });
+    if (actions.selected != null) {
+      actions.selected.draw();
     }
   }
 
   /* Event handlers */
 
   function click(evt) {
-    if (selected.action != null) {
-      selected.action.click(evt);
+    if (actions.selected != null) {
+      actions.selected.click(evt);
     } else if (actions.click != null) {
-      selected.action = actions.click;
-      selected.action.click(evt);
+      actions.selected = actions.click;
+      actions.selected.click(evt);
     }
   }
 
   function keypress(evt) {
     evt.preventDefault();
-    if (selected.action != null) {
+    if (actions.selected != null) {
       if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
-        action = selected.action;
-        selected.action = null;
+        action = actions.selected;
+        actions.selected = null;
         action.cancel();
       } else {
-        selected.action.keypress(evt);
+        actions.selected.keypress(evt);
       }
     } else {
       if (evt.charCode != 0) {
-        selected.action = actions[String.fromCharCode(evt.charCode)];
+        if ((actions.selected = actions[String.fromCharCode(evt.charCode)]) != null) {
+          actions.selected.init(evt);
+        }
+      } else if (evt.keyCode != 0) {
+        if ((actions.selected  = actions[evt.keyCode]) != null) {
+          actions.selected.init(evt);
+        }
       }
     }
   }
 
   function mousemove(evt) {
-    if (selected.action != null) {
-      selected.action.mousemove(evt);
+    if (actions.selected != null) {
+      actions.selected.mousemove(evt);
     }
   }
 
@@ -314,57 +430,34 @@ var Map = function(json_arg, id_arg) {
   function Tile(x, y) {
     this.x = x;
     this.y = y;
-    this.corner = {
-      x: x * tile_size,
-      y: y * tile_size
-    };
-    this.center = {
-      x: (x + 0.5) * tile_size,
-      y: (y + 0.5) * tile_size
-    }
+    this.corner = { x: x, y: y }
+    this.center = { x: (x + 0.5), y: (y + 0.5) }
 
     this.getFigures = function() {
-      var results = [];
-      for (var i=0, l=figures.length; i < l; i++) {
-        var figure = figures[i];
-        if (figure.inTile(this)) {
-          results.push(figure);
-        }
-      }
-      return results;
+      var tile = this;
+      return results = $.grep(figures, function(figure) { return figure.inTile(tile); });
     }
   }
 
   function Wall(json) {
-    this.vertices = [];
     if (json == null) {
       this.id = null;
+      this.vertices = [];
     } else {
       this.id = json.id;
-      var vertex;
-      for (var i=0, l=json.vertices.length; i < l; i++) {
-        vertex = json.vertices[i];
-        this.vertices.push(getTileByPosition(vertex.x, vertex.y));
-      }
+      this.vertices = $.map(json.vertices, function(vertex) { return getTileByPosition(vertex.x, vertex.y); });
     }
 
     this.save = function() {
-      walls.push(this);
-      var vertex;
-      var xy = [];
-      for (var i=0, l=this.vertices.length; i < l; i++) {
-        vertex = this.vertices[i];
-        xy.push('' + vertex.x + ',' + vertex.y);
-      }
-      data = {
-        'xy[]': xy,
-      }
       if (this.id == null) {
+        walls.push(this);
         var wall = this;
         $.ajax({
           type: 'POST',
-          url: window.location.href + "/walls",
-          data: data,
+          url: url + "/walls",
+          data: {
+            'xy[]': $.map(this.vertices, function(vertex) { return '' + vertex.x + ',' + vertex.y; })
+          },
           success: function(results) {
             wall.id = results.id;
           }
@@ -372,7 +465,7 @@ var Map = function(json_arg, id_arg) {
       } else {
         $.ajax({
           type: 'PUT',
-          url: window.location.href + "/walls/" + this.id,
+          url: url + "/walls/" + this.id,
           data: data
         });
       }
@@ -382,13 +475,11 @@ var Map = function(json_arg, id_arg) {
       if (this.vertices.length > 1) {
         context.save();
         context.beginPath();
-        var vertex = this.vertices[0];
-        context.moveTo(vertex.x * tile_size, vertex.y * tile_size);
-        for (var i=1, l=this.vertices.length; i < l; i++) {
-          vertex = this.vertices[i];
-          context.lineTo(vertex.x * tile_size, vertex.y * tile_size);
-        }
-        context.lineWidth = tile_size / 4;
+        var start = this.vertices.shift();
+        context.moveTo(start.x, start.y);
+        $.each(this.vertices, function(i, vertex) { context.lineTo(vertex.x, vertex.y); });
+        this.vertices.unshift(start);
+        context.lineWidth = 0.2;
         context.stroke();
         context.restore();
       }
@@ -412,7 +503,7 @@ var Map = function(json_arg, id_arg) {
         var figure = this;
         $.ajax({
           type: 'POST',
-          url: window.location.href + "/figures",
+          url: url + "/figures",
           data: data,
           success: function(results) {
             figure.id = results.id;
@@ -421,17 +512,29 @@ var Map = function(json_arg, id_arg) {
       } else {
         $.ajax({
           type: 'PUT',
-          url: window.location.href + "/figures/" + this.id,
+          url: url + "/figures/" + this.id,
           data: data
         });
       }
+    }
+
+    this.destroy = function() {
+      var index = figures.indexOf(this);
+      if (index == null) {
+        throw 'Selected figure does not exist';
+      }
+      figures.splice(index, 1);
+      $.ajax({
+        type: 'DELETE',
+        url: url + "/figures/" + this.id
+      });
     }
 
     this.enlarge = function() {
       var figure = this;
       $.ajax({
         type: 'POST',
-        url: window.location.href + "/figures/" + this.id + "/enlarge",
+        url: url + "/figures/" + this.id + "/enlarge",
         success: function(results) {
           figure.size = results.size;
           draw();
@@ -443,18 +546,11 @@ var Map = function(json_arg, id_arg) {
       var figure = this;
       $.ajax({
         type: 'POST',
-        url: window.location.href + "/figures/" + this.id + "/reduce",
+        url: url + "/figures/" + this.id + "/reduce",
         success: function(results) {
           figure.size = results.size;
           draw();
         }
-      });
-    }
-
-    this.destroy = function() {
-      $.ajax({
-        type: 'DELETE',
-        url: window.location.href + "/figures/" + this.id
       });
     }
 
@@ -473,7 +569,7 @@ var Map = function(json_arg, id_arg) {
     }
 
     this.getSize = function() {
-      return this.getScale() * tile_size;
+      return this.getScale();
     }
 
     this.moveToTile = function(target) {
@@ -508,7 +604,9 @@ var Map = function(json_arg, id_arg) {
 
     this.drawLetter = function(context) {
       context.save();
-      var size = this.getSize();
+      // Firefox and Safari were both having issues with 1px fonts, so we scale by 10 as a workaround
+      context.scale(0.1, 0.1);
+      var size = this.getSize() * 10;
       var offset = size / 2;
       context.font = '' + size + 'px courier';
       context.textAlign = 'center';
@@ -520,7 +618,7 @@ var Map = function(json_arg, id_arg) {
 
   function init() {
     draw();
-    $(selector)
+    $('#' + id)
       .click(click)
       .mousemove(mousemove);
     $(document).keypress(keypress);

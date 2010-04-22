@@ -1,7 +1,7 @@
 class MapsController < ApplicationController
   def show
-    @map = Map.find(params[:id])
-    @json = @map.to_json(:include => { :figures => { :include => :character }, :walls => { :include => :vertices } })
+    map = Map.find(params[:id])
+    redirect_to map_viewport_path(map, map.viewports.create)
   end
 
   def latest

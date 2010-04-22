@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416211128) do
+ActiveRecord::Schema.define(:version => 20100420013810) do
 
   create_table "characters", :force => true do |t|
     t.string "letter", :limit => 1,                  :null => false
@@ -42,6 +42,13 @@ ActiveRecord::Schema.define(:version => 20100416211128) do
   end
 
   add_index "vertices", ["wall_id"], :name => "index_vertices_on_wall_id"
+
+  create_table "viewports", :force => true do |t|
+    t.integer "map_id",                  :null => false
+    t.float   "x",      :default => 0.0, :null => false
+    t.float   "y",      :default => 0.0, :null => false
+    t.float   "scale",  :default => 1.0, :null => false
+  end
 
   create_table "walls", :force => true do |t|
     t.integer "map_id", :null => false

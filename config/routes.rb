@@ -5,6 +5,11 @@ Combat::Application.routes.draw do |map|
     member do
       get :latest
     end
+    resources :viewports do
+      member do
+        post :zoom, :pan
+      end
+    end
     resources :figures do
       member do
         post :enlarge, :reduce

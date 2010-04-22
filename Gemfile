@@ -25,3 +25,5 @@ gem 'capybara',         :git => 'git://github.com/jnicklas/capybara.git'
 gem 'database_cleaner', :git => 'git://github.com/bmabey/database_cleaner.git'
 gem 'cucumber-rails',   :git => 'git://github.com/aslakhellesoy/cucumber-rails.git'
 gem "rspec-rails", :git => 'git://github.com/rspec/rspec-rails.git'
+
+gem 'ruby-debug', :group => :development

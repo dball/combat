@@ -360,8 +360,8 @@ var Map = function(json, id, viewport_id) {
   }
 
   function keypress(evt) {
-    evt.preventDefault();
     if (actions.selected != null) {
+      evt.preventDefault();
       if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
         action = actions.selected;
         actions.selected = null;
@@ -372,10 +372,12 @@ var Map = function(json, id, viewport_id) {
     } else {
       if (evt.charCode != 0) {
         if ((actions.selected = actions[String.fromCharCode(evt.charCode)]) != null) {
+          evt.preventDefault();
           actions.selected.init(evt);
         }
       } else if (evt.keyCode != 0) {
         if ((actions.selected  = actions[evt.keyCode]) != null) {
+          evt.preventDefault();
           actions.selected.init(evt);
         }
       }

@@ -73,7 +73,7 @@ var Map = function(json, id, viewport_id) {
     },
     c: {
       title: 'Create figure',
-      letter: null,
+      letter: 'm',
       tile: null,
       init: function(evt) {
         this.mousemove(evt);

@@ -1,0 +1,25 @@
+== D&D Combat
+
+D&D Combat is an interactive combat map system for D&D 3.5 and other games with tactical combat on a square grid.
+
+It's installed on heroku here: http://dndcombat.heroku.com/
+
+The commands are:
+
+ * c enters character create mode. Typing any other letter stores it in the buffer, and clicking on the map puts a character denoted by that latter on the grid. Escape exits.
+
+ * click to select a character, clicking more than once cycles through the rest of the characters on the tile. Click anywhere else to move it, or [ or ] to reduce or enlarge it. Character sizes under medium are honored, up to fine, but are not rendered differently yet. Hit backspace to delete a selected character.
+
+ * d enter draw walls mode. Click on intersections adds vertices to the wall, hitting escape saves if the wall has more than one vertex. There is no way to edit or delete walls yet.
+
+ * the arrow keys pan the grid by 25%, [ and ] zoom in and out by 25%. = or reload resets the view centered on the contents with a minimum grid size of 20 tiles.
+
+== Work in progress
+
+ * Edit, delete walls
+
+ * Background images for interesting maps
+
+ * Authentication and access control
+
+ * Parties, with standard marching and door-opening layouts

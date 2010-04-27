@@ -9,6 +9,14 @@ class Figure < ActiveRecord::Base
   validates_numericality_of :position_y
   validates_inclusion_of :size, :in => SIZE_CODES
 
+  def x
+    position_x
+  end
+
+  def y
+    position_y
+  end
+
   def enlarge
     change_size(1)
   end

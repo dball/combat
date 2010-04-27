@@ -1,63 +1,74 @@
 var Map = function(json, id, viewport_id) {
   var canvas = document.getElementById(id);
+  /*
   $(canvas).width($('#' + viewport_id).width());
   $(canvas).height($('#' + viewport_id).height());
-  var url = window.location.href + "/../..";
+  */
+  var url = window.location.href;
   var context = canvas.getContext('2d');
-  var scale = json.scale;
+  var tiles = {}
+  var figures = $.map(json.figures, function(figure) { return new Figure(figure); });
+  var walls = $.map(json.walls, function(wall) { return new Wall(wall); });
+
   var viewport = {
-    x: json.x,
-    y: json.y
+    load: function(results) {
+      viewport.left = results.left;
+      viewport.top = results.top;
+      viewport.width = results.width;
+      viewport.height = results.height;
+      viewport.scale = results.scale;
+      viewport.setContext();
+      draw();
+    },
+    reset: function() {
+      var viewport = this;
+      $.ajax({
+        type: 'POST',
+        url: url + "/reset",
+        data: { aspect: canvas.width * 1.0 / canvas.height },
+        success: function(results) { viewport.load(results); }
+      });
+    },
+    zoom: function(direction) {
+      $.ajax({
+        type: 'POST',
+        url: window.location.href + "/zoom",
+        data: { direction: direction },
+        success: function(results) { viewport.load(results); }
+      });
+    },
+    pan: function(direction, axis) {
+      var viewport = this;
+      $.ajax({
+        type: 'POST',
+        url: url + "/pan",
+        data: { direction: direction, axis: axis },
+        success: function(results) { viewport.load(results); }
+      });
+    },
+    setContext: function() {
+      tiles.size = (canvas.width * 1.0 / viewport.width) * this.scale;
+      context.setTransform(tiles.size, 0, 0, tiles.size, 0, 0);
+      context.translate(-this.left, -this.top);
+    },
+    getTileByPixel: function(x, y) {}
   }
-  var width = 30;
-  var height = 20;
-  var tiles = {
-    size: Math.min(canvas.width / json.map.width, canvas.height / json.map.height) * scale
-  }
-  context.scale(tiles.size, tiles.size);
-  context.translate(-viewport.x, -viewport.y);
+  viewport.reset();
 
-  var figures = [];
-  $.each(json.map.figures, function(i, figure) { figures.push(new Figure(figure)); });
-
-  var walls = [];
-  $.each(json.map.walls, function(i, wall) { walls.push(new Wall(wall)); });
   var actions = {
     selected: null,
     ']': {
       title: 'Zoom in',
       init: function(evt) {
-        $.ajax({
-          type: 'POST',
-          url: window.location.href + "/zoom",
-          data: { direction: '+' },
-          success: function(results) {
-            ratio = results.scale / scale;
-            scale = results.scale;
-            tiles.size = tiles.size * ratio;
-            context.scale(ratio, ratio);
-            draw();
-          }
-        });
         actions.selected = null;
+        viewport.zoom('+');
       }
     },
     '[': {
       title: 'Zoom out',
       init: function(evt) {
-        $.ajax({
-          type: 'POST',
-          url: window.location.href + "/zoom",
-          data: { direction: '-' },
-          success: function(results) {
-            ratio = results.scale / scale;
-            scale = results.scale;
-            tiles.size = tiles.size * ratio;
-            context.scale(ratio, ratio);
-            draw();
-          }
-        });
         actions.selected = null;
+        viewport.zoom('-');
       }
     },
     c: {
@@ -238,8 +249,8 @@ var Map = function(json, id, viewport_id) {
           context.fillStyle = 'rgba(255, 0, 0, 0.25)';
           var tile = this.tiles.current;
           context.translate(tile.corner.x, tile.corner.y);
-          var size = figure.getSize();
-          context.fillRect(0, 0, size, size);
+          var scale = figure.getScale();
+          context.fillRect(0, 0, scale, scale);
           context.fillStyle = 'rgba(0, 0, 255, 1)'
           context.shadowOffsetX = 2;
           context.shadowOffsetY = 2;
@@ -255,90 +266,40 @@ var Map = function(json, id, viewport_id) {
   actions[KeyEvent.DOM_VK_LEFT] = {
     init: function(evt) {
       actions.selected = null;
-      $.ajax({
-        type: 'POST',
-        url: window.location.href + "/pan",
-        data: { direction: '-', axis: 'x' },
-        success: function(results) {
-          context.translate(viewport.x - results.x, 0);
-          viewport.x = results.x;
-          draw();
-        }
-      });
+      viewport.pan('-', 'x');
     }
   }
   actions[KeyEvent.DOM_VK_RIGHT] = {
     init: function(evt) {
       actions.selected = null;
-      $.ajax({
-        type: 'POST',
-        url: window.location.href + "/pan",
-        data: { direction: '+', axis: 'x' },
-        success: function(results) {
-          context.translate(viewport.x - results.x, 0);
-          viewport.x = results.x;
-          draw();
-        }
-      });
+      viewport.pan('+', 'x');
     }
   }
   actions[KeyEvent.DOM_VK_UP] = {
     init: function(evt) {
       actions.selected = null;
-      $.ajax({
-        type: 'POST',
-        url: window.location.href + "/pan",
-        data: { direction: '-', axis: 'y' },
-        success: function(results) {
-          context.translate(0, viewport.y - results.y);
-          viewport.y = results.y;
-          draw();
-        }
-      });
+      viewport.pan('-', 'y');
     }
   }
   actions[KeyEvent.DOM_VK_DOWN] = {
     init: function(evt) {
       actions.selected = null;
-      $.ajax({
-        type: 'POST',
-        url: window.location.href + "/pan",
-        data: { direction: '+', axis: 'y' },
-        success: function(results) {
-          context.translate(0, viewport.y - results.y);
-          viewport.y = results.y;
-          draw();
-        }
-      });
+      viewport.pan('+', 'y');
     }
   }
   actions['='] = {
     title: 'reset viewport',
     init: function(evt) {
       actions.selected = null;
-      $.ajax({
-        type: 'PUT',
-        url: window.location.href,
-        data: {
-          'viewport[x]': 0,
-          'viewport[y]': 0,
-          'viewport[scale]': 1,
-        }
-      });
-      context.translate(viewport.x, viewport.y);
-      context.scale(1 / scale, 1 / scale);
-      viewport.x = 0;
-      viewport.y = 0;
-      scale = 1;
-      draw();
+      viewport.reset();
     }
   }
 
   function getTileByPixel(x, y) {
     var position = $(canvas).position();
     return getTileByPosition(
-      Math.floor(viewport.x + (x - position.left) / tiles.size),
-      Math.floor(viewport.y + (y - position.top) / tiles.size)
+      Math.floor(viewport.left + (x - position.left) / tiles.size),
+      Math.floor(viewport.top + (y - position.top) / tiles.size)
     );
   }
 
@@ -358,16 +319,18 @@ var Map = function(json, id, viewport_id) {
   function drawGrid() {
     context.save();
     context.beginPath();
-    for (var i=0; i < width; i++) {
-      context.moveTo(i, 0);
-      context.lineTo(i, height);
+    // FIXME we're drawing at tile centers, not tile edges...? Maybe?
+    // FIXME truncate
+    for (var i=Math.ceil(viewport.left), right = Math.floor(viewport.left + viewport.width); i <= right; i++) {
+      context.moveTo(i, viewport.top);
+      context.lineTo(i, viewport.top + viewport.height);
     }
-    for (var i=0; i < height; i++) {
-      context.moveTo(0, i);
-      context.lineTo(width, i);
+    for (var i=Math.ceil(viewport.top), bottom = Math.floor(viewport.top + viewport.height); i <= bottom; i++) {
+      context.moveTo(viewport.left, i);
+      context.lineTo(viewport.left + viewport.width, i);
     }
-    context.lineWidth = 0.025;
-    context.strokeStyle = 'rgba(200, 200, 200, 1)';
+    context.lineWidth = 0.02;
+    context.strokeStyle = 'rgba(100, 100, 100, 1)';
     context.stroke();
     context.restore();
   }
@@ -568,10 +531,6 @@ var Map = function(json, id, viewport_id) {
       return 1;
     }
 
-    this.getSize = function() {
-      return this.getScale();
-    }
-
     this.moveToTile = function(target) {
       this.tile = target;
       this.save();
@@ -584,19 +543,19 @@ var Map = function(json, id, viewport_id) {
     }
 
     this.getCenter = function() {
-      var size = this.getSize();
+      var scale = this.getScale();
       return {
-        x: size / 2 + this.tile.corner.x,
-        y: size / 2 + this.tile.corner.y
+        x: scale / 2 + this.tile.corner.x,
+        y: scale / 2 + this.tile.corner.y
       }
     }
 
     this.draw = function() {
       context.save();
-      var size = this.getSize();
+      var scale = this.getScale();
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
       context.translate(this.tile.corner.x, this.tile.corner.y);
-      context.fillRect(0, 0, size, size);
+      context.fillRect(0, 0, scale, scale);
       context.fillStyle = 'rgba(0, 0, 0, 1)';
       this.drawLetter(context);
       context.restore();
@@ -606,9 +565,9 @@ var Map = function(json, id, viewport_id) {
       context.save();
       // Firefox and Safari were both having issues with 1px fonts, so we scale by 10 as a workaround
       context.scale(0.1, 0.1);
-      var size = this.getSize() * 10;
-      var offset = size / 2;
-      context.font = '' + size + 'px courier';
+      var scale = this.getScale() * 10;
+      var offset = scale / 2;
+      context.font = '' + scale + 'px courier';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.fillText(this.letter, offset, offset);

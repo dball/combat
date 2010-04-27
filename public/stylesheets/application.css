@@ -12,3 +12,7 @@
 #combat #viewport {
   display: table-cell;
 }
+
+#combat #controls dl > dd {
+  display: none;
+}

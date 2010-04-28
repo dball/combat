@@ -8,3 +8,5 @@ gem 'capybara',         :git => 'git://github.com/jnicklas/capybara.git', :group
 gem 'database_cleaner', :git => 'git://github.com/bmabey/database_cleaner.git', :group => :test
 gem 'cucumber-rails',   :git => 'git://github.com/aslakhellesoy/cucumber-rails.git', :group => :test
 gem "rspec-rails", :git => 'git://github.com/rspec/rspec-rails.git', :group => :test
+gem 'aws-s3'
+gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'

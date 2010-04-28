@@ -7,6 +7,10 @@ class Image < ActiveRecord::Base
       :access_key_id => ENV['S3_KEY'],
       :secret_access_key => ENV['S3_SECRET']
     },
-    :bucket => "combat_#{Rails.env.to_s}",
+    :bucket => "combat-#{Rails.env.to_s}",
     :path => '/images/:id'
+
+  def url
+    image.url
+  end
 end

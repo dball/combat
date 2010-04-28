@@ -9,6 +9,7 @@ var Map = function(json, id, viewport_id) {
   var tiles = {}
   var figures = $.map(json.figures, function(figure) { return new Figure(figure); });
   var walls = $.map(json.walls, function(wall) { return new Wall(wall); });
+  var pictures = $.map(json.images, function(image) { return new Picture(image); });
 
   var viewport = {
     load: function(results) {
@@ -340,9 +341,10 @@ var Map = function(json, id, viewport_id) {
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.restore();
+    $.each(pictures, function(i, picture) { picture.draw(); });
     drawGrid();
-    $.each(figures, function(i, figure) { figure.draw(); });
     $.each(walls, function(i, wall) { wall.draw(); });
+    $.each(figures, function(i, figure) { figure.draw(); });
     if (actions.selected != null) {
       actions.selected.draw();
     }
@@ -574,6 +576,27 @@ var Map = function(json, id, viewport_id) {
       context.textBaseline = 'middle';
       context.fillText(this.letter, offset, offset);
       context.restore();
+    }
+  }
+
+  // I would like to name this Image, but am not sure how to construct new root Image instances if I do
+  function Picture(json) {
+    this.id = json.id;
+    this.url = json.url;
+    this.x = json.x;
+    this.y = json.y;
+    this.width = json.width;
+    this.height = json.height;
+    this.img = new Image();
+    this.img.src = this.url;
+
+    this.draw = function() {
+      if (this.x != null && this.y != null) {
+        context.save();
+        //context.globalAlpha = 0.5;
+        context.drawImage(this.img, this.x, this.y, this.width, this.height);
+        context.restore();
+      }
     }
   }
 

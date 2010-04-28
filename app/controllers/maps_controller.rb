@@ -1,6 +1,10 @@
 class MapsController < ApplicationController
   def show
-    @json = map.to_json(:include => { :figures => { :include => :character }, :walls => { :include => :vertices } })
+    @json = map.to_json(:include => {
+      :figures => { :include => :character },
+      :walls => { :include => :vertices },
+      :images => { :methods => :url }
+    })
   end
 
   def create
@@ -34,7 +38,7 @@ class MapsController < ApplicationController
   end
 
   def map
-    @map ||= Map.find(params[:id])
+    @map ||= Map.find(params[:id], :include => [:figures, :images, { :walls => :vertices }])
   end
   
   def viewport

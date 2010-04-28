@@ -59,17 +59,30 @@ var Map = function(json, id, viewport_id) {
   var actions = {
     selected: null,
     ']': {
-      title: 'Zoom in',
+      title: 'zoom in',
       init: function(evt) {
         actions.selected = null;
         viewport.zoom('+');
       }
     },
     '[': {
-      title: 'Zoom out',
+      title: 'zoom out',
       init: function(evt) {
         actions.selected = null;
         viewport.zoom('-');
+      }
+    },
+    i: {
+      title: 'draw Image',
+      init: function(evt) {
+        actions.selected = null;
+        $.ajax({
+          type: 'GET',
+          url: url + "/images/new",
+          success: function(response) {
+            $('<div></div>').html(response).dialog({ title: 'Upload Image' });
+          }
+        });
       }
     },
     c: {

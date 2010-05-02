@@ -9,4 +9,4 @@ gem 'database_cleaner', :git => 'git://github.com/bmabey/database_cleaner.git', 
 gem 'cucumber-rails',   :git => 'git://github.com/aslakhellesoy/cucumber-rails.git', :group => :test
 gem "rspec-rails", :git => 'git://github.com/rspec/rspec-rails.git', :group => :test
 gem 'aws-s3'
-gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git', :branch => 'rails3'
+gem 'paperclip', :git => 'git://github.com/JasonKing/paperclip.git', :branch => 'rails3'

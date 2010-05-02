@@ -17,6 +17,10 @@ class Figure < ActiveRecord::Base
     position_y
   end
 
+  def points
+    [{ :x => x, :y => y }]
+  end
+
   def enlarge
     change_size(1)
   end

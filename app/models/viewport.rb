@@ -77,8 +77,8 @@ class Viewport
       self.width = MIN_SIZE
       self.height = MIN_SIZE
     else
-      x = points.map {|p| p.x }
-      y = points.map {|p| p.y }
+      x = points.map {|p| p[:x] }
+      y = points.map {|p| p[:y] }
       self.left = x.min
       self.top = y.min
       if (self.width = x.max - left) < MIN_SIZE

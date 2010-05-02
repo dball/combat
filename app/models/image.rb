@@ -12,4 +12,8 @@ class Image < ActiveRecord::Base
   def url
     image.url
   end
+
+  def points
+    [{ :x => x, :y => y }, { :x => x + width, :y => y + height }]
+  end
 end

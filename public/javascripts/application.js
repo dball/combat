@@ -619,6 +619,26 @@ var Map = function(json, id, viewport_id) {
       .click(click)
       .mousemove(mousemove);
     $(document).keypress(keypress);
+    document.addEventListener("dragover", function(event) {
+      event.preventDefault();
+    }, true);
+    document.addEventListener("drop", function(event) {
+      event.preventDefault();
+      var dt = event.dataTransfer;
+      var files = dt.files;
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var reader = new FileReader();  
+        reader.onload = function(event) {
+          var xhr = new XMLHttpRequest();  
+          xhr.open("POST", window.location.href + "/images", true);  
+          xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+          xhr.setRequestHeader("Content-Length", file.fileSize);
+          xhr.sendAsBinary(this.result);
+        }
+        reader.readAsBinaryString(file);  
+      }
+    }, true);
   }
 
   return {

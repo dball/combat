@@ -14,6 +14,10 @@ class Image < ActiveRecord::Base
   end
 
   def points
-    [{ :x => x, :y => y }, { :x => x + width, :y => y + height }]
+    x && y && width && height ? [{ :x => x, :y => y }, { :x => x + width, :y => y + height }] : []
+  end
+
+  def blob=(blob)
+    StringIO.open(blob) {|io| self.image = io }
   end
 end

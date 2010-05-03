@@ -8,7 +8,7 @@ class ImagesController < ApplicationController
   end
 
   def create
-    if image = map.images.create(params[:image])
+    if image = map.images.create(:blob => request.raw_post)
       redirect_to map_image_path(map, image)
     end
   end

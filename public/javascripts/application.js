@@ -634,6 +634,7 @@ var Map = function(json, id, viewport_id) {
           xhr.open("POST", window.location.href + "/images", true);  
           xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
           xhr.setRequestHeader("Content-Length", file.fileSize);
+          xhr.setRequestHeader("Content-Type", file.type);
           xhr.sendAsBinary(this.result);
         }
         reader.readAsBinaryString(file);  

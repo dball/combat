@@ -11,7 +11,7 @@ class ImagesController < ApplicationController
     image = map.images.build(:blob => request.raw_post)
     image.image_content_type = request.content_type
     if image.save
-      render :json => { :id => image.id }, :status => :created
+      render :json => image.to_json(:methods => :url), :status => :created
     else
       head :error
     end

@@ -600,11 +600,19 @@ var Map = function(json, id, viewport_id) {
     this.y = json.y;
     this.width = json.width;
     this.height = json.height;
-    this.img = new Image();
-    this.img.src = this.url;
+    if (this.url != null) {
+      this.img = new Image();
+      var picture = this;
+      this.img.onload = function(arg) {
+        if (picture.x != null && picture.y != null) {
+          draw();
+        }
+      }
+      this.img.src = this.url;
+    }
 
     this.draw = function() {
-      if (this.x != null && this.y != null) {
+      if (this.img != null && this.img.complete && this.x != null && this.y != null) {
         context.save();
         //context.globalAlpha = 0.5;
         context.drawImage(this.img, this.x, this.y, this.width, this.height);

@@ -644,6 +644,21 @@ var Map = function(json, id, viewport_id) {
           xhr.setRequestHeader("Content-Length", file.fileSize);
           xhr.setRequestHeader("Content-Type", file.type);
           xhr.sendAsBinary(this.result);
+          xhr.onreadystatechange = function (e) {  
+            if (xhr.readyState == 4) {  
+              if (xhr.status == 201) {
+                var json = $.parseJSON(xhr.responseText);
+                json.x = 0;
+                json.y = 0;
+                json.width = 1;
+                json.height = 1;
+                pictures.push(new Picture(json));
+                draw();
+              } else {
+                console.log("error", xhr);
+              }
+            }
+          }
         }
         reader.readAsBinaryString(file);  
       }

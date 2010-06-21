@@ -73,16 +73,28 @@ var Map = function(json, id, viewport_id) {
       }
     },
     i: {
-      title: 'draw Image',
+      title: 'select Image',
+      index: null,
+      getPicture: function() {
+        if (this.index != null) {
+          return pictures[this.index];
+        }
+      },
       init: function(evt) {
-        actions.selected = null;
-        $.ajax({
-          type: 'GET',
-          url: url + "/images/new",
-          success: function(response) {
-            $('<div></div>').html(response).dialog({ title: 'Upload Image' });
-          }
-        });
+        if (pictures.length > 0) {
+          this.index = 0;
+          this.getPicture().selected = true;
+          draw();
+        }
+      },
+      mousemove: function(evt) {},
+      draw: function() {},
+      keypress: function(evt) {},
+      click: function(evt) {},
+      cancel: function() {
+        this.getPicture().selected = false;
+        this.index = null;
+        draw();
       }
     },
     c: {
@@ -614,7 +626,9 @@ var Map = function(json, id, viewport_id) {
     this.draw = function() {
       if (this.img != null && this.img.complete && this.x != null && this.y != null) {
         context.save();
-        //context.globalAlpha = 0.5;
+        if (this.selected) {
+          context.globalAlpha = 0.5;
+        }
         context.drawImage(this.img, this.x, this.y, this.width, this.height);
         context.restore();
       }

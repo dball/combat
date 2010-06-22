@@ -26,7 +26,8 @@ Combat.figures = {
 
     this.data = function() {
       var result = {};
-      $.each(this.fields, function(i, field) { result[field] = this.attrs[field]; });
+      var that = this;
+      $.each(this.fields, function(i, field) { result[field] = that.attrs[field]; });
       return result;
     }
 
@@ -73,8 +74,8 @@ Combat.figures = {
 
     this.on = function(tile) {
       var scale = this.scale();
-      return target.x >= this.tile.x && target.x < this.tile.x + scale &&
-        target.y >= this.tile.y && target.y < this.tile.y + scale;
+      return tile.x >= this.tile.x && tile.x < this.tile.x + scale &&
+        tile.y >= this.tile.y && tile.y < this.tile.y + scale;
     }
 
     this.center = function() {

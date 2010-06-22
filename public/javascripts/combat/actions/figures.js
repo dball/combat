@@ -7,7 +7,6 @@ Combat.actions.register({
     this.figures = [];
     this.tiles.current = null;
     this.tiles.start = null;
-    actions.selected = null;
     Combat.draw();
   },
   figures: [],
@@ -18,30 +17,29 @@ Combat.actions.register({
   nextFigure: function() {
     var length = this.figures.length;
     if (length == 0) {
-      Combat.actions.stop(this);
+      this.index = null;
     } else if (this.index == null) {
       this.index = 0;
     } else if (this.index < length - 1) {
       this.index += 1;
     } else {
-      Combat.actions.stop(this);
+      this.index = null;
     }
   },
   click: function(evt) {
     this.tiles.current = Combat.map.getTileByPixel(evt.pageX, evt.pageY);
     if (this.tiles.start == null) {
       this.tiles.start = this.tiles.current;
-      this.figures = this.tiles.start.getFigures();
+      var that = this;
+      this.figures = $.grep(Combat.figures.all, function(figure) { return figure.on(that.tiles.start); });
       this.nextFigure();
     } else if (this.tiles.start == this.tiles.current) {
       this.nextFigure();
-      if (this.getFigure() == null) {
-        Combat.actions.stop(this);
-      }
     } else {
-      this.getFigure().moveToTile(this.tiles.current);
-      Combat.actions.stop(this);
+      this.getFigure().move(this.tiles.current);
+      this.index = null;
     }
+    if (this.getFigure() == null) { Combat.actions.stop(this); }
     Combat.draw();
   },
   mousemove: function(evt) {

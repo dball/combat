@@ -1,22 +1,32 @@
 Combat.actions = {
   active: null,
   triggers: {
-    keys: {}
+    keys: {},
+    mouse: {}
   },
-  register: function(params) {
-    this.triggers.keys[params.trigger] = params;
+  register: function(action) {
+    if (action.trigger.mouse) {
+      this.triggers.mouse[action.trigger.mouse] = action;
+    } else {
+      this.triggers.keys[action.trigger] = action;
+    }
   },
   stop: function(action) {
     if (action && (action != this.active)) { throw 'You can only stop the active action'; }
     this.active = null;
     if (action.end) { action.end(); }
   },
+  start: function(action, evt) {
+    if (this.active) { throw 'You cannot start multiple actions at once'; }
+    this.active = action;
+    action.begin(evt);
+  },
   click: function(evt) {
     var action = Combat.actions.active;
     if (action != null) {
       if (action.click) { action.click(evt); }
-    } else if (action = Combat.actions.active = Combat.actions.triggers.mouse.click != null) {
-      action.begin(evt);
+    } else if (action = Combat.actions.triggers.mouse.click) {
+      Combat.actions.start(action, evt);
     }
   },
   mousemove: function(evt) {
@@ -33,8 +43,8 @@ Combat.actions = {
       else if (action.keypress) { action.keypress(evt); }
     } else {
       var key = evt.charCode != 0 ? String.fromCharCode(evt.charCode) : evt.keyCode
-      if (action = Combat.actions.active = Combat.actions.triggers.keys[key]) {
-        evt.preventDefault(); action.begin(evt);
+      if (action = Combat.actions.triggers.keys[key]) {
+        evt.preventDefault(); Combat.actions.start(action, evt);
       }
     }
   },

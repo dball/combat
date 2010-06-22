@@ -5,11 +5,9 @@ var Combat = {
     this.map.init(json, id, viewport_id);
     this.figures.init(json.figures);
     /*
-    var figures = $.map(json.figures, function(figure) { return new Figure(figure); });
     var walls = $.map(json.walls, function(wall) { return new Wall(wall); });
     var pictures = $.map(json.images, function(image) { return new Picture(image); });
     */
-    console.log("combat init", this);
     this.map.viewport.reset();
     this.actions.bind($('#' + id));
   },

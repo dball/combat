@@ -86,7 +86,6 @@ Combat.figures = {
     }
 
     this.draw = function(context) {
-      console.log("drawing", this);
       context.save();
       var scale = this.scale();
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';

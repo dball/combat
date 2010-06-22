@@ -58,14 +58,14 @@ Combat.map = {
     }
   },
   getTileByPixel: function(x, y) {
-    var position = $(canvas).position();
-    return getTileByPosition(
+    var position = $(this.canvas).position();
+    return this.getTileByPosition(
       Math.floor(this.viewport.left + (x - position.left) / this.tiles.size),
       Math.floor(this.viewport.top + (y - position.top) / this.tiles.size)
     );
   },
   getIntersectionByPixel: function(x, y) {
-    return getTileByPixel(x + tiles.size / 2, y + tiles.size / 2);
+    return this.getTileByPixel(x + this.tiles.size / 2, y + this.tiles.size / 2);
   },
   getTileByPosition: function(x, y) {
     if (x == null || y == null) {

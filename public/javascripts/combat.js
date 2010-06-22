@@ -9,6 +9,7 @@ var Combat = {
     var walls = $.map(json.walls, function(wall) { return new Wall(wall); });
     var pictures = $.map(json.images, function(image) { return new Picture(image); });
     */
+    console.log("combat init", this);
     this.map.viewport.reset();
     this.actions.bind($('#' + id));
   },
@@ -19,9 +20,10 @@ var Combat = {
     this.map.context.clearRect(0, 0, this.map.canvas.width, this.map.canvas.height);
     this.map.context.restore();
     //$.each(pictures, function(i, picture) { picture.draw(); });
-    this.map.grid.draw();
+    this.map.draw();
     //$.each(walls, function(i, wall) { wall.draw(); });
-    //$.each(figures, function(i, figure) { figure.draw(); });
+    var that = this;
+    $.each(this.figures.all, function(i, figure) { figure.draw(that.map.context); });
     //if (actions.selected != null) {
     //  actions.selected.draw();
     //}

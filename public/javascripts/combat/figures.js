@@ -49,13 +49,13 @@ Combat.figures = {
     this.enlarge = function() {
       var that = this;
       $.ajax({ type: 'POST', url: this.url('enlarge'), success: function(results) { that.load(results); } });
-      Combat.map.draw();
+      Combat.draw();
     }
 
     this.reduce = function() {
       var that = this;
       $.ajax({ type: 'POST', url: this.url('reduce'), success: function(results) { that.load(results); } });
-      Combat.map.draw();
+      Combat.draw();
     }
 
     this.scale = function() {
@@ -86,6 +86,7 @@ Combat.figures = {
     }
 
     this.draw = function(context) {
+      console.log("drawing", this);
       context.save();
       var scale = this.scale();
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
@@ -105,7 +106,7 @@ Combat.figures = {
       context.font = '' + scale + 'px courier';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText(this.letter, offset, offset);
+      context.fillText(this.attrs.letter, offset, offset);
       context.restore();
     }
 

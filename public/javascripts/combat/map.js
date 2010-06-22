@@ -33,7 +33,7 @@ Combat.map = {
       this.height = results.height;
       this.scale = results.scale;
       Combat.map.setContext();
-      Combat.map.draw();
+      Combat.draw();
     },
     reset: function() {
       var viewport = this;

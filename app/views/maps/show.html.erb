@@ -59,7 +59,10 @@
     $(function() {
       var json = <%= @json.html_safe %>;
       var map = new Map(json, 'map', 'viewport');
-      map.init();
+      //map.init();
+      //Combat.map.init(json, 'map', 'viewport');
+      Combat.init(json, 'map', 'viewport');
+      console.log("combat map", Combat.map);
     });
   <% end %>
 </section>

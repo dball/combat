@@ -36,29 +36,24 @@ Combat.map = {
       Combat.draw();
     },
     reset: function() {
-      var viewport = this;
-      $.ajax({
-        type: 'POST',
-        url: Combat.url + "/reset",
+      var that = this;
+      $.ajax({ type: 'POST', url: Combat.url + "/reset",
         data: { aspect: Combat.map.canvas.width * 1.0 / Combat.map.canvas.height },
-        success: function(results) { viewport.load(results); }
+        success: function(results) { that.load(results); }
       });
     },
     zoom: function(direction) {
-      $.ajax({
-        type: 'POST',
-        url: Combat.url + "/zoom",
+      var that = this;
+      $.ajax({ type: 'POST', url: Combat.url + "/zoom",
         data: { direction: direction },
-        success: function(results) { viewport.load(results); }
+        success: function(results) { that.load(results); }
       });
     },
     pan: function(direction, axis) {
-      var viewport = this;
-      $.ajax({
-        type: 'POST',
-        url: url + "/pan",
+      var that = this;
+      $.ajax({ type: 'POST', url: url + "/pan",
         data: { direction: direction, axis: axis },
-        success: function(results) { viewport.load(results); }
+        success: function(results) { that.load(results); }
       });
     }
   },

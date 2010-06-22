@@ -1,15 +1,15 @@
 Combat.actions = {
   active: null,
-  create: function(params) {
-    this.begin = function(evt) { params.begin(evt); console.log("begin", this); }
-    this.end = function(evt) { if (params.end) { params.end(evt); }; console.log("end", this); }
-  },
   triggers: {
     keys: {}
   },
   register: function(params) {
-    // Is the new worthwhile at all?
-    this.triggers.keys[params.trigger] = new this.create(params);
+    this.triggers.keys[params.trigger] = params;
+  },
+  stop: function(action) {
+    if (action && (action != this.active)) { throw 'You can only stop the active action'; }
+    this.active = null;
+    if (action.end) { action.end(); }
   },
   click: function(evt) {
     var action = Combat.actions.active;
@@ -29,7 +29,7 @@ Combat.actions = {
     var action = Combat.actions.active;
     if (action != null) {
       evt.preventDefault();
-      if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) { Combat.actions.active = null; action.end(); } 
+      if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) { Combat.actions.stop(action); }
       else if (action.keypress) { action.keypress(evt); }
     } else {
       var key = evt.charCode != 0 ? String.fromCharCode(evt.charCode) : evt.keyCode

@@ -4,7 +4,7 @@ Combat.actions.register({
   begin: function(evt) {
     console.log("begin zoom in", this, Combat);
     Combat.map.viewport.zoom('+');
-    this.end();
+    Combat.actions.stop(this);
   }
 });
 
@@ -13,7 +13,7 @@ Combat.actions.register({
   title: 'zoom out',
   begin: function(evt) {
     Combat.map.viewport.zoom('-');
-    this.end();
+    Combat.actions.stop(this);
   }
 });
 
@@ -22,6 +22,6 @@ Combat.actions.register({
   title: 'reset viewport',
   begin: function(evt) {
     Combat.map.viewport.reset();
-    this.end();
+    Combat.actions.stop(this);
   }
 });

@@ -4,16 +4,14 @@ var Combat = {
   init: function(json, id, viewport_id) {
     this.map.init(json, id, viewport_id);
     this.figures.init(json.figures);
-    /*
-    var walls = $.map(json.walls, function(wall) { return new Wall(wall); });
-    var pictures = $.map(json.images, function(image) { return new Picture(image); });
-    */
+    this.pictures.init(json.images);
+    //var walls = $.map(json.walls, function(wall) { return new Wall(wall); });
     this.map.viewport.reset();
     this.actions.bind($('#' + id));
   },
 
   draw: function() {
-    this.map.draw(this.figures, this.actions);
+    this.map.draw(this.pictures, this.figures, this.actions);
     //$.each(walls, function(i, wall) { wall.draw(); });
   }
 }

@@ -25,22 +25,23 @@ Combat.figures = {
     this.url = function() {
       var parts = [Combat.figures.url];
       if (this.attrs.id) { parts.push(this.attrs.id); }
-      return parts.concat(arguments).join('/');
+      var args = Array.prototype.slice.call(arguments);
+      return parts.concat(args).join('/');
     }
 
-    this.data = function() {
-      var result = {};
+    this.params = function() {
+      var params = {};
       var that = this;
-      $.each(this.fields, function(i, field) { result[field] = that.attrs[field]; });
-      return result;
+      $.each(this.fields, function(i, field) { params['figure[' + field + ']'] = that.attrs[field]; });
+      return params;
     }
 
     this.save = function() {
       if (this.attrs.id == null) {
         var that = this;
-        $.ajax({ type: 'POST', url: this.url(), data: this.data(), success: function(results) { that.load(results, 'id'); } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { that.load(json, 'id'); } });
       } else {
-        $.ajax({ type: 'PUT', url: this.url(), data: this.data() });
+        $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
     }
 

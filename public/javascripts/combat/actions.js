@@ -4,6 +4,9 @@ Combat.actions = {
     keys: {},
     mouse: {}
   },
+  draw: function(context) {
+    if (this.active && this.active.draw) { this.active.draw(context); }
+  },
   register: function(action) {
     if (action.trigger.mouse) {
       this.triggers.mouse[action.trigger.mouse] = action;

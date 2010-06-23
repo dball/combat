@@ -5,6 +5,10 @@ Combat.figures = {
     this.url = Combat.url + '/figures';
   },
 
+  draw: function(context) {
+    $.each(this.all, function() { this.draw(context); });
+  },
+
   create: function(json) {
     this.attrs = {};
     this.tile = null;

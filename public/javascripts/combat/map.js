@@ -5,20 +5,27 @@ Combat.map = {
   },
   tiles:  {},
   draw: function() {
-    this.context.save();
-    this.context.beginPath();
+    var context = this.context;
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    context.restore();
+
+    context.save();
+    context.beginPath();
     for (var i=Math.ceil(this.viewport.left), right = Math.floor(this.viewport.left + this.viewport.width); i <= right; i++) {
-      this.context.moveTo(i, this.viewport.top);
-      this.context.lineTo(i, this.viewport.top + this.viewport.height);
+      context.moveTo(i, this.viewport.top);
+      context.lineTo(i, this.viewport.top + this.viewport.height);
     }
     for (var i=Math.ceil(this.viewport.top), bottom = Math.floor(this.viewport.top + this.viewport.height); i <= bottom; i++) {
-      this.context.moveTo(this.viewport.left, i);
-      this.context.lineTo(this.viewport.left + this.viewport.width, i);
+      context.moveTo(this.viewport.left, i);
+      context.lineTo(this.viewport.left + this.viewport.width, i);
     }
-    this.context.lineWidth = 0.02;
-    this.context.strokeStyle = 'rgba(100, 100, 100, 1)';
-    this.context.stroke();
-    this.context.restore();
+    context.lineWidth = 0.02;
+    context.strokeStyle = 'rgba(100, 100, 100, 1)';
+    context.stroke();
+    context.restore();
+    for (var i=0, l=arguments.length; i < l; i++) { arguments[i].draw(context); }
   },
   setContext: function() {
     this.tiles.size = (this.canvas.width * 1.0 / this.viewport.width) * this.viewport.scale;

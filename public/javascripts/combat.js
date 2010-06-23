@@ -13,18 +13,8 @@ var Combat = {
   },
 
   draw: function() {
-    this.map.context.save();
-    this.map.context.setTransform(1, 0, 0, 1, 0, 0);
-    this.map.context.clearRect(0, 0, this.map.canvas.width, this.map.canvas.height);
-    this.map.context.restore();
-    //$.each(pictures, function(i, picture) { picture.draw(); });
-    this.map.draw();
+    this.map.draw(this.figures, this.actions);
     //$.each(walls, function(i, wall) { wall.draw(); });
-    var that = this;
-    $.each(this.figures.all, function(i, figure) { figure.draw(that.map.context); });
-    //if (actions.selected != null) {
-    //  actions.selected.draw();
-    //}
   }
 }
 

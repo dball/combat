@@ -54,19 +54,17 @@ Combat.figures = {
 
     this.enlarge = function() {
       var that = this;
-      $.ajax({ type: 'POST', url: this.url('enlarge'), success: function(results) { that.load(results); } });
-      Combat.draw();
+      $.ajax({ type: 'POST', url: this.url('enlarge'), success: function(results) { that.load(results); Combat.draw(); } });
     }
 
     this.reduce = function() {
       var that = this;
-      $.ajax({ type: 'POST', url: this.url('reduce'), success: function(results) { that.load(results); } });
-      Combat.draw();
+      $.ajax({ type: 'POST', url: this.url('reduce'), success: function(results) { that.load(results); Combat.draw(); } });
     }
 
     this.scale = function() {
       var sizes = { L: 2, H: 3, G: 4, C: 6 };
-      var scale = sizes[this.size];
+      var scale = sizes[this.attrs.size];
       return (scale ? scale : 1);
     }
 

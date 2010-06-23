@@ -5,9 +5,7 @@ Combat.figures = {
     this.url = Combat.url + '/figures';
   },
 
-  draw: function(context) {
-    $.each(this.all, function() { this.draw(context); });
-  },
+  draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
 
   create: function(json) {
     this.attrs = {};
@@ -97,7 +95,15 @@ Combat.figures = {
       context.fillRect(0, 0, scale, scale);
       context.fillStyle = 'rgba(0, 0, 0, 1)';
       this.drawLetter(context);
+      if (this.selected) {
+        context.save();
+        scale = this.scale();
+        context.lineWidth = 0.05;
+        context.strokeRect(0, 0, scale, scale);
+        context.restore();
+      }
       context.restore();
+
     }
 
     this.drawLetter = function(context) {
@@ -110,6 +116,14 @@ Combat.figures = {
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.fillText(this.attrs.letter, offset, offset);
+      context.restore();
+    }
+
+    this.drawCursor = function(context, tile) {
+      context.save();
+      context.globalAlpha = 0.5;
+      context.translate(tile.x - this.tile.x, tile.y - this.tile.y);
+      this.draw(context);
       context.restore();
     }
 

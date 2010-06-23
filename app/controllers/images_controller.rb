@@ -17,7 +17,15 @@ class ImagesController < ApplicationController
     end
   end
 
+  def update
+    head(image.update_attributes(params[:image]) ? :no_content : :error)
+  end
+
   private
+
+  def image
+    @image ||= Image.find(params[:id], :conditions => { :map_id => params[:map_id] })
+  end
    
   def map
     Map.find(params[:map_id])

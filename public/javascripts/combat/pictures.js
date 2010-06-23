@@ -2,7 +2,7 @@ Combat.pictures = {
   init: function(json) {
     var that = this;
     this.all = $.map(json, function(json) { return new that.create(json); });
-    this.url = Combat.url + '/pictures';
+    this.url = Combat.url + '/images';
   },
 
   draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
@@ -28,10 +28,32 @@ Combat.pictures = {
     this.draw = function(context) {
       if (this.attrs.x != null && this.attrs.y != null && this.img && this.img.complete) {
         context.save();
-        if (this.selected) { context.globalAlpha = 0.5; }
         context.drawImage(this.img, this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
+        if (this.selected) {
+          context.lineWidth = 0.05;
+          context.strokeRect(this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
+        }
         context.restore();
       }
+    }
+
+    this.drawCursor = function(context, tile) {
+      context.save();
+      context.globalAlpha = 0.5;
+      context.translate(tile.x - this.attrs.x, tile.y - this.attrs.y);
+      this.draw(context);
+      context.restore();
+    }
+
+    this.on = function(tile) {
+      return tile.x >= this.attrs.x && tile.x < this.attrs.x + this.attrs.width &&
+        tile.y >= this.attrs.y && tile.y < this.attrs.y + this.attrs.height;
+    }
+
+    this.move = function(tile) {
+      this.attrs.x = tile.x;
+      this.attrs.y = tile.y;
+      this.save();
     }
 
     this.url = function() {

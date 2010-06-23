@@ -13,6 +13,10 @@ var Combat = {
   draw: function() {
     this.map.draw(this.pictures, this.figures, this.actions);
     //$.each(walls, function(i, wall) { wall.draw(); });
+  },
+
+  things: function() {
+    return this.figures.all.concat(this.pictures.all);
   }
 }
 

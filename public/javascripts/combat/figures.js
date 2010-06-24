@@ -75,8 +75,8 @@ Combat.figures = {
 
     this.on = function(tile) {
       var scale = this.scale();
-      return tile.x >= this.tile.x && tile.x < this.tile.x + scale &&
-        tile.y >= this.tile.y && tile.y < this.tile.y + scale;
+      var offset = { x: tile.x - this.tile.x, y: tile.y - this.tile.y };
+      return ((offset.x >= 0 && offset.x < scale && offset.y >= 0 && offset.y < scale) ? offset : null);
     }
 
     this.center = function() {
@@ -119,10 +119,10 @@ Combat.figures = {
       context.restore();
     }
 
-    this.drawCursor = function(context, tile) {
+    this.drawCursor = function(context, tile, offset) {
       context.save();
       context.globalAlpha = 0.5;
-      context.translate(tile.x - this.tile.x, tile.y - this.tile.y);
+      context.translate(tile.x - this.tile.x - offset.x, tile.y - this.tile.y - offset.y);
       this.draw(context);
       context.restore();
     }

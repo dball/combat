@@ -22,15 +22,15 @@ Combat.actions.register({
       } else {
         this.index = null;
       }
-      if (this.current) { this.current.selected = false; }
+      if (this.current) { this.current.thing.selected = false; }
       this.current = (this.index != null ? this.all[this.index] : null);
-      if (this.current) { this.current.selected = true; }
+      if (this.current) { this.current.thing.selected = true; }
       return this.current;
     },
     clear: function() {
       this.all = [];
       this.index = null;
-      if (this.current) { this.current.selected = false; }
+      if (this.current) { this.current.thing.selected = false; }
       this.current = null;
     }
   },
@@ -41,12 +41,13 @@ Combat.actions.register({
       this.tiles.start = this.tiles.current;
       var that = this;
       // TODO on function needs to return some sort of offset if we are to handle moving large objects well
-      this.things.all = $.grep(Combat.things(), function(thing) { return thing.on(that.tiles.current); });
+      var all = $.map(Combat.things(), function(thing) { return { thing: thing, offset: thing.on(that.tiles.current) }; });
+      this.things.all = $.grep(all, function(props) { return props.offset; });
       this.things.next();
     } else if (this.tiles.start == this.tiles.current) {
       this.things.next();
     } else {
-      this.things.current.move(this.tiles.current);
+      this.things.current.thing.move(this.tiles.current);
       this.things.clear();
     }
     if (!this.things.current) { Combat.actions.stop(this); }
@@ -54,13 +55,13 @@ Combat.actions.register({
   },
   mousemove: function(evt) {
     this.tiles.current = Combat.map.getTileByPixel(evt.pageX, evt.pageY);
-    if (this.things.current != null) { Combat.draw(); }
+    if (this.things.current) { Combat.draw(); }
   },
   keypress: function(evt) {
-    var thing = this.things.current;
-    if (thing != null) {
+    var current = this.things.current;
+    if (current != null) {
       if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-        thing.destroy();
+        current.thing.destroy();
         Combat.actions.stop(this);
         return;
       // TODO This is obviously figure-specific behavior which should get extracted out to a sub-action? ho ho ho.
@@ -68,11 +69,11 @@ Combat.actions.register({
         var key = String.fromCharCode(evt.charCode);
         switch(key) {
           case ']':
-            thing.enlarge();
+            current.thing.enlarge();
             Combat.draw();
             return;
           case '[':
-            thing.reduce();
+            current.thing.reduce();
             Combat.draw();
             return;
         }
@@ -82,7 +83,7 @@ Combat.actions.register({
     keypress(evt);
   },
   draw: function(context) {
-    var thing = this.things.current;
-    if (thing && thing.drawCursor) { thing.drawCursor(context, this.tiles.current); }
+    var current = this.things.current;
+    if (current && current.thing.drawCursor) { current.thing.drawCursor(context, this.tiles.current, current.offset); }
   }
 });

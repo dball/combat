@@ -119,10 +119,10 @@ Combat.figures = {
       context.restore();
     }
 
-    this.drawCursor = function(context, tile, offset) {
+    this.drawCursor = function(context, tile) {
       context.save();
       context.globalAlpha = 0.5;
-      context.translate(tile.x - this.tile.x - offset.x, tile.y - this.tile.y - offset.y);
+      context.translate(tile.x - this.tile.x, tile.y - this.tile.y);
       this.draw(context);
       context.restore();
     }

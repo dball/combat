@@ -34,20 +34,25 @@ Combat.actions.register({
       this.current = null;
     }
   },
-  tiles: { start: null, current: null },
+  tiles: {
+    start: null, 
+    current: null,
+    current_with_offset: function(offset) {
+      return Combat.map.getTileByPosition(this.current.x - offset.x, this.current.y - offset.y);
+    }
+  },
   click: function(evt) {
     this.tiles.current = Combat.map.getTileByPixel(evt.pageX, evt.pageY);
     if (this.tiles.start == null) {
       this.tiles.start = this.tiles.current;
       var that = this;
-      // TODO on function needs to return some sort of offset if we are to handle moving large objects well
       var all = $.map(Combat.things(), function(thing) { return { thing: thing, offset: thing.on(that.tiles.current) }; });
       this.things.all = $.grep(all, function(props) { return props.offset; });
       this.things.next();
     } else if (this.tiles.start == this.tiles.current) {
       this.things.next();
     } else {
-      this.things.current.thing.move(this.tiles.current);
+      this.things.current.thing.move(this.tiles.current_with_offset(this.things.current.offset));
       this.things.clear();
     }
     if (!this.things.current) { Combat.actions.stop(this); }
@@ -84,6 +89,8 @@ Combat.actions.register({
   },
   draw: function(context) {
     var current = this.things.current;
-    if (current && current.thing.drawCursor) { current.thing.drawCursor(context, this.tiles.current, current.offset); }
+    if (current && current.thing.drawCursor) {
+      current.thing.drawCursor(context, this.tiles.current_with_offset(current.offset));
+    }
   }
 });

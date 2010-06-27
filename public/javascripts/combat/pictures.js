@@ -37,17 +37,21 @@ Combat.pictures = {
       }
     }
 
-    this.drawCursor = function(context, tile, offset) {
+    this.drawCursor = function(context, tile) {
       context.save();
       context.globalAlpha = 0.5;
-      context.translate(tile.x - this.attrs.x - offset.x, tile.y - this.attrs.y - offset.y);
+      context.translate(tile.x - this.attrs.x, tile.y - this.attrs.y);
       this.draw(context);
       context.restore();
     }
 
     this.on = function(tile) {
+      var target = { x: [0, this.attrs.width - 1], y: [0, this.attrs.height - 1] };
       var offset = { x: tile.x - this.attrs.x, y: tile.y - this.attrs.y };
-      return ((offset.x >= 0 && offset.x < this.attrs.width && offset.y >= 0 && offset.y < this.attrs.height) ? offset : null);
+      return ((
+        ($.inArray(offset.x, target.x) != -1 && offset.y >=0 && offset.y < this.attrs.height) ||
+        ($.inArray(offset.y, target.y) != -1 && offset.x >= 0 && offset.x < this.attrs.width))
+        ? offset : null);
     }
 
     this.move = function(tile) {

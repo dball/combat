@@ -9,7 +9,6 @@ Combat.pictures = {
 
   create: function(json) {
     this.attrs = {};
-    this.tile = null;
     this.fields = ['x', 'y', 'width', 'height', 'url'];
 
     this.load = function(json) {
@@ -44,26 +43,32 @@ Combat.pictures = {
       }
     }
 
-    this.drawCursor = function(context, tile) {
+    this.drawCursor = function(context, point) {
       context.save();
       context.globalAlpha = 0.5;
-      context.translate(tile.x - this.attrs.x, tile.y - this.attrs.y);
+      context.translate(point.tile.x - this.attrs.x, point.tile.y - this.attrs.y);
       this.draw(context);
       context.restore();
     }
 
-    this.on = function(tile) {
-      var target = { x: [0, this.attrs.width - 1], y: [0, this.attrs.height - 1] };
-      var offset = { x: tile.x - this.attrs.x, y: tile.y - this.attrs.y };
-      return ((
-        ($.inArray(offset.x, target.x) != -1 && offset.y >=0 && offset.y < this.attrs.height) ||
-        ($.inArray(offset.y, target.y) != -1 && offset.x >= 0 && offset.x < this.attrs.width))
-        ? offset : null);
+    this.contains = function(point) {
+      var offset = { x: point.x - this.attrs.x, y: point.y - this.attrs.y };
+      if (offset.x < 0 || offset.y < 0 || offset.x > this.attrs.width || offset.y > this.attrs.height) { return null; }
+      var border = Math.max(1, this.attrs.width * 0.1, this.attrs.height * 0.1);
+      if (
+        (offset.x >= 0 && offset.x < border) ||
+        (offset.x <= this.attrs.width && offset.x > this.attrs.width - border) ||
+        (offset.y >= 0 && offset.y < border) ||
+        (offset.y <= this.attrs.height && offset.y > this.attrs.height - border)
+      ) {
+        return offset;
+      }
+      return null;
     }
 
-    this.move = function(tile) {
-      this.attrs.x = tile.x;
-      this.attrs.y = tile.y;
+    this.move = function(point) {
+      this.attrs.x = point.tile.x;
+      this.attrs.y = point.tile.y;
       this.save();
     }
 
@@ -108,26 +113,6 @@ Combat.pictures = {
       $.ajax({ type: 'POST', url: this.url('reduce'), success: function(results) { that.load(results); Combat.draw(); } });
     }
 
-    this.move = function(tile) {
-      this.tile = tile;
-      this.attrs.position_x = this.tile.x;
-      this.attrs.position_y = this.tile.y;
-      this.save();
-    }
-
-    this.on = function(tile) {
-      var scale = this.scale();
-      return tile.x >= this.tile.x && tile.x < this.tile.x + scale &&
-        tile.y >= this.tile.y && tile.y < this.tile.y + scale;
-    }
-
-    this.center = function() {
-      var scale = this.scale();
-      return {
-        x: scale / 2 + this.tile.corner.x,
-        y: scale / 2 + this.tile.corner.y
-      }
-    }
     */
 
     this.load(json, 'id');

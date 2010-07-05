@@ -3,7 +3,30 @@ Combat.map = {
     this.canvas = document.getElementById(id);
     this.context = this.canvas.getContext('2d');
   },
-  tiles:  {},
+  tiles: {},
+  point: function(pixel) {
+    var position = $(Combat.map.canvas).position();
+    return this.points.create({
+      x: Combat.map.viewport.left + (pixel.x - position.left) / this.tiles.size,
+      y: Combat.map.viewport.top + (pixel.y - position.top) / this.tiles.size
+    });
+  },
+  points:  {
+    create: function(point) {
+      return {
+        type: 'point',
+        x: point.x,
+        y: point.y,
+        minus: function(point) { return Combat.map.points.create({ x: this.x - point.x, y: this.y - point.y }); },
+        tile: {
+          x: Math.floor(point.x),
+          y: Math.floor(point.y),
+          equals: function(tile) { return this.x == tile.x && this.y == this.y; },
+          minus: function(tile) { return Combat.map.points.create({ x: this.x - tile.x, y: this.y - tile.y }).tile; }
+        },
+      }
+    },
+  },
   draw: function() {
     var context = this.context;
     context.save();
@@ -63,31 +86,5 @@ Combat.map = {
         success: function(results) { that.load(results); }
       });
     }
-  },
-  getTileByPixel: function(x, y) {
-    var position = $(this.canvas).position();
-    return this.getTileByPosition(
-      Math.floor(this.viewport.left + (x - position.left) / this.tiles.size),
-      Math.floor(this.viewport.top + (y - position.top) / this.tiles.size)
-    );
-  },
-  getIntersectionByPixel: function(x, y) {
-    return this.getTileByPixel(x + this.tiles.size / 2, y + this.tiles.size / 2);
-  },
-  getTileByPosition: function(x, y) {
-    if (x == null || y == null) {
-      throw 'Invalid tile position ' + x + ',' + y;
-    }
-    var key = '' + x + ',' + y;
-    var tile = this.tiles[key];
-    if (tile == null) {
-      tile = this.tiles[key] = {
-        x: x,
-        y: y,
-        corner: { x: x, y: y },
-        center: { x: (x + 0.5), y: (y + 0.5) }
-      }
-    }
-    return tile;
   }
 }

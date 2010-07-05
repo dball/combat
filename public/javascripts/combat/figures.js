@@ -17,7 +17,7 @@ Combat.figures = {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
       $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
-      this.tile = Combat.map.getTileByPosition(this.attrs.position_x, this.attrs.position_y);
+      this.tile = Combat.map.points.create({ x: this.attrs.position_x, y: this.attrs.position_y }).tile;
     }
 
     this.url = function() {
@@ -66,32 +66,24 @@ Combat.figures = {
       return (scale ? scale : 1);
     }
 
-    this.move = function(tile) {
-      this.tile = tile;
+    this.move = function(point) {
+      this.tile = point.tile;
       this.attrs.position_x = this.tile.x;
       this.attrs.position_y = this.tile.y;
       this.save();
     }
 
-    this.on = function(tile) {
+    this.contains = function(point) {
       var scale = this.scale();
-      var offset = { x: tile.x - this.tile.x, y: tile.y - this.tile.y };
+      var offset = { x: point.x - this.tile.x, y: point.y - this.tile.y };
       return ((offset.x >= 0 && offset.x < scale && offset.y >= 0 && offset.y < scale) ? offset : null);
-    }
-
-    this.center = function() {
-      var scale = this.scale();
-      return {
-        x: scale / 2 + this.tile.corner.x,
-        y: scale / 2 + this.tile.corner.y
-      }
     }
 
     this.draw = function(context) {
       context.save();
       var scale = this.scale();
       context.fillStyle = 'rgba(100, 100, 100, 0.3)';
-      context.translate(this.tile.corner.x, this.tile.corner.y);
+      context.translate(this.tile.x, this.tile.y);
       context.fillRect(0, 0, scale, scale);
       context.fillStyle = 'rgba(0, 0, 0, 1)';
       this.drawLetter(context);
@@ -119,10 +111,10 @@ Combat.figures = {
       context.restore();
     }
 
-    this.drawCursor = function(context, tile) {
+    this.drawCursor = function(context, point) {
       context.save();
       context.globalAlpha = 0.5;
-      context.translate(tile.x - this.tile.x, tile.y - this.tile.y);
+      context.translate(point.tile.x - this.tile.x, point.tile.y - this.tile.y);
       this.draw(context);
       context.restore();
     }

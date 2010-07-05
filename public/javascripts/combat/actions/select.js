@@ -5,8 +5,8 @@ Combat.actions.register({
   end: function() {
     this.index = null;
     this.things.clear();
-    this.tiles.start = null;
-    this.tiles.current = null;
+    this.points.start = null;
+    this.points.current = null;
     Combat.draw();
   },
   things: {
@@ -34,32 +34,32 @@ Combat.actions.register({
       this.current = null;
     }
   },
-  tiles: {
-    start: null, 
-    current: null,
-    current_with_offset: function(offset) {
-      return Combat.map.getTileByPosition(this.current.x - offset.x, this.current.y - offset.y);
-    }
+  pixel: function(evt) {
+    return { x: evt.pageX, y: evt.pageY };
+  },
+  points: {
+    start: null,
+    current: null
   },
   click: function(evt) {
-    this.tiles.current = Combat.map.getTileByPixel(evt.pageX, evt.pageY);
-    if (this.tiles.start == null) {
-      this.tiles.start = this.tiles.current;
+    this.points.current = Combat.map.point(this.pixel(evt));
+    if (this.points.start == null) {
+      this.points.start = this.points.current;
       var that = this;
-      var all = $.map(Combat.things(), function(thing) { return { thing: thing, offset: thing.on(that.tiles.current) }; });
+      var all = $.map(Combat.things(), function(thing) { return { thing: thing, offset: thing.contains(that.points.current) }; });
       this.things.all = $.grep(all, function(props) { return props.offset; });
       this.things.next();
-    } else if (this.tiles.start == this.tiles.current) {
+    } else if (this.points.start.tile.x == this.points.current.tile.x && this.points.start.tile.y == this.points.current.tile.y) {
       this.things.next();
     } else {
-      this.things.current.thing.move(this.tiles.current_with_offset(this.things.current.offset));
+      this.things.current.thing.move(this.points.current.minus(this.things.current.offset));
       this.things.clear();
     }
     if (!this.things.current) { Combat.actions.stop(this); }
     Combat.draw();
   },
   mousemove: function(evt) {
-    this.tiles.current = Combat.map.getTileByPixel(evt.pageX, evt.pageY);
+    this.points.current = Combat.map.point(this.pixel(evt));
     if (this.things.current) { Combat.draw(); }
   },
   keypress: function(evt) {
@@ -90,7 +90,7 @@ Combat.actions.register({
   draw: function(context) {
     var current = this.things.current;
     if (current && current.thing.drawCursor) {
-      current.thing.drawCursor(context, this.tiles.current_with_offset(current.offset));
+      current.thing.drawCursor(context, this.points.current.minus(current.offset));
     }
   }
 });

@@ -55,7 +55,11 @@ Combat.actions.register({
       this.things.current.thing.move(this.points.current.minus(this.things.current.offset));
       this.things.clear();
     }
-    if (!this.things.current) { Combat.actions.stop(this); }
+    if (this.things.current) {
+      if (evt.shiftKey) { this.things.current.thing.selected = 'shift'; }
+    } else {
+      Combat.actions.stop(this);
+    }
     Combat.draw();
   },
   mousemove: function(evt) {
@@ -90,15 +94,20 @@ Combat.actions.register({
   draw: function(context) {
     var current = this.things.current;
     if (current) {
-      context.save();
-      context.lineWidth = 0.05;
-      current.thing.drawBorder(context);
-      context.globalAlpha = 0.5;
-      var point = this.points.current.minus(current.offset);
-      context.translate(point.tile.x - current.thing.tile.x, point.tile.y - current.thing.tile.y);
-      current.thing.draw(context);
-      current.thing.drawBorder(context);
-      context.restore();
+      var thing = current.thing;
+      if (thing.selected == 'shift') {
+        thing.drawResizeHandle(context);
+      } else {
+        context.save();
+        context.lineWidth = 0.05;
+        thing.drawBorder(context);
+        context.globalAlpha = 0.5;
+        var point = this.points.current.minus(current.offset);
+        context.translate(point.tile.x - thing.tile.x, point.tile.y - thing.tile.y);
+        thing.draw(context);
+        thing.drawBorder(context);
+        context.restore();
+      }
     }
   }
 });

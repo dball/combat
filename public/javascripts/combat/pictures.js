@@ -37,12 +37,36 @@ Combat.pictures = {
     }
 
     this.drawResizeHandle = function(context) {
-      context.lineWidth = Math.max(this.attrs.width * 0.01, this.attrs.height * 0.01, 0.1);
+      context.save();
+      context.translate(this.attrs.x, this.attrs.y);
+      var width = this.attrs.width;
+      var height = this.attrs.height;
+      context.lineWidth = Math.max(width * 0.01, height * 0.01, 0.1) / 2;
+
+      context.strokeStyle = '#666';
+      context.strokeRect(0, 0, width, height);
+
       context.beginPath();
-      context.moveTo(this.attrs.width * 0.9, this.attrs.height);
-      context.lineTo(this.attrs.width, this.attrs.height);
-      context.lineTo(this.attrs.width, this.attrs.height * 0.9);
+      context.moveTo(0, 0);
+      context.lineTo(width, height);
       context.stroke();
+
+      context.strokeStyle = '#000';
+      context.lineWidth = context.lineWidth * 2;
+
+      context.beginPath();
+      context.moveTo(width * 0.1, 0);
+      context.lineTo(0, 0);
+      context.lineTo(0, height * 0.1);
+      context.stroke();
+
+      context.beginPath();
+      context.moveTo(width * 0.9, height);
+      context.lineTo(width, height);
+      context.lineTo(width, height * 0.9);
+      context.stroke();
+
+      context.restore();
     }
 
     this.contains = function(point) {

@@ -32,6 +32,13 @@ Combat.pictures = {
         if (this.selected) {
           context.lineWidth = 0.05;
           context.strokeRect(this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
+
+          context.lineWidth = Math.max(this.attrs.width * 0.01, this.attrs.height * 0.01, 0.1);
+          context.beginPath();
+          context.moveTo(this.attrs.width * 0.9, this.attrs.height);
+          context.lineTo(this.attrs.width, this.attrs.height);
+          context.lineTo(this.attrs.width, this.attrs.height * 0.9);
+          context.stroke();
         }
         context.restore();
       }

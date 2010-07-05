@@ -34,9 +34,15 @@ Combat.actions = {
   },
   mousemove: function(evt) {
     var action = Combat.actions.active;
-    if (action && action.mousemove) {
-      action.mousemove(evt);
-    }
+    if (action && action.mousemove) { action.mousemove(evt); }
+  },
+  mousedown: function(evt) {
+    var action = Combat.actions.active;
+    if (action && action.mousedown) { action.mousedown(evt); }
+  },
+  mouseup: function(evt) {
+    var action = Combat.actions.active;
+    if (action && action.mouseup) { action.mouseup(evt); }
   },
   keypress: function(evt) {
     var action = Combat.actions.active;
@@ -54,6 +60,8 @@ Combat.actions = {
   bind: function(element) {
     element.click(this.click);
     element.mousemove(this.mousemove);
+    element.mousedown(this.mousedown);
+    element.mouseup(this.mouseup);
     $(document).keypress(this.keypress);
     document.addEventListener("dragover", function(event) {
       event.preventDefault();

@@ -9,6 +9,7 @@ Combat.pictures = {
 
   create: function(json) {
     this.attrs = {};
+    this.tile = null;
     this.fields = ['x', 'y', 'width', 'height', 'url'];
 
     this.load = function(json) {
@@ -22,33 +23,26 @@ Combat.pictures = {
         this.img.onload = function(arg) { if (that.attrs.x && that.attrs.y) { Combat.draw(); } }
         this.img.src = this.attrs.url;
       }
+      this.tile = Combat.map.points.create(this.attrs).tile;
     }
 
     this.draw = function(context) {
       if (this.attrs.x != null && this.attrs.y != null && this.img && this.img.complete) {
-        context.save();
         context.drawImage(this.img, this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
-        if (this.selected) {
-          context.lineWidth = 0.05;
-          context.strokeRect(this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
-
-          context.lineWidth = Math.max(this.attrs.width * 0.01, this.attrs.height * 0.01, 0.1);
-          context.beginPath();
-          context.moveTo(this.attrs.width * 0.9, this.attrs.height);
-          context.lineTo(this.attrs.width, this.attrs.height);
-          context.lineTo(this.attrs.width, this.attrs.height * 0.9);
-          context.stroke();
-        }
-        context.restore();
       }
     }
 
-    this.drawCursor = function(context, point) {
-      context.save();
-      context.globalAlpha = 0.5;
-      context.translate(point.tile.x - this.attrs.x, point.tile.y - this.attrs.y);
-      this.draw(context);
-      context.restore();
+    this.drawBorder = function(context) {
+      context.strokeRect(this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
+    }
+
+    this.drawResizeHandle = function(context) {
+      context.lineWidth = Math.max(this.attrs.width * 0.01, this.attrs.height * 0.01, 0.1);
+      context.beginPath();
+      context.moveTo(this.attrs.width * 0.9, this.attrs.height);
+      context.lineTo(this.attrs.width, this.attrs.height);
+      context.lineTo(this.attrs.width, this.attrs.height * 0.9);
+      context.stroke();
     }
 
     this.contains = function(point) {
@@ -67,6 +61,7 @@ Combat.pictures = {
     }
 
     this.move = function(point) {
+      this.tile = point.tile;
       this.attrs.x = point.tile.x;
       this.attrs.y = point.tile.y;
       this.save();

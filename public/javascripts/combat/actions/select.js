@@ -89,8 +89,16 @@ Combat.actions.register({
   },
   draw: function(context) {
     var current = this.things.current;
-    if (current && current.thing.drawCursor) {
-      current.thing.drawCursor(context, this.points.current.minus(current.offset));
+    if (current) {
+      context.save();
+      context.lineWidth = 0.05;
+      current.thing.drawBorder(context);
+      context.globalAlpha = 0.5;
+      var point = this.points.current.minus(current.offset);
+      context.translate(point.tile.x - current.thing.tile.x, point.tile.y - current.thing.tile.y);
+      current.thing.draw(context);
+      current.thing.drawBorder(context);
+      context.restore();
     }
   }
 });

@@ -8,6 +8,7 @@ Combat.figures = {
   draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
 
   create: function(json) {
+    this.type = 'figure';
     this.attrs = {};
     this.tile = null;
     this.fields = ['size', 'letter', 'position_x', 'position_y'];
@@ -87,15 +88,7 @@ Combat.figures = {
       context.fillRect(0, 0, scale, scale);
       context.fillStyle = 'rgba(0, 0, 0, 1)';
       this.drawLetter(context);
-      if (this.selected) {
-        context.save();
-        scale = this.scale();
-        context.lineWidth = 0.05;
-        context.strokeRect(0, 0, scale, scale);
-        context.restore();
-      }
       context.restore();
-
     }
 
     this.drawLetter = function(context) {
@@ -111,12 +104,9 @@ Combat.figures = {
       context.restore();
     }
 
-    this.drawCursor = function(context, point) {
-      context.save();
-      context.globalAlpha = 0.5;
-      context.translate(point.tile.x - this.tile.x, point.tile.y - this.tile.y);
-      this.draw(context);
-      context.restore();
+    this.drawBorder = function(context) {
+      var scale = this.scale();
+      context.strokeRect(this.tile.x, this.tile.y, scale, scale);
     }
 
     this.load(json, 'id');

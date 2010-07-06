@@ -5,6 +5,25 @@ Combat.figures = {
     this.url = Combat.url + '/figures';
   },
 
+  sizes: {
+    M: 1,
+    L: 2,
+    H: 3,
+    G: 4,
+    C: 6,
+    order: ['M', 'L', 'H', 'G', 'C'],
+    larger: function(size) {
+      var index = this.order.indexOf(size);
+      if (index == -1 || index == this.order.length - 1) { return this.order[this.order.length - 1]; }
+      return this.order[index + 1];
+    },
+    smaller: function(size) {
+      var index = this.order.indexOf(size);
+      if (index == -1 || index == 0) { return this.order[0]; }
+      return this.order[index - 1];
+    }
+  },
+
   draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
 
   create: function(attrs) {
@@ -69,8 +88,7 @@ Combat.figures = {
     }
 
     this.scale = function() {
-      var sizes = { L: 2, H: 3, G: 4, C: 6 };
-      var scale = sizes[this.attrs.size];
+      var scale = Combat.figures.sizes[this.attrs.size];
       return (scale ? scale : 1);
     }
 

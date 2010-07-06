@@ -105,8 +105,16 @@ Combat.pictures = {
 
     this.move = function(point) {
       this.tile = point.tile;
+      // TODO should pictures be tile-aligned?
       this.attrs.x = point.tile.x;
       this.attrs.y = point.tile.y;
+      this.save();
+    }
+
+    this.resizeTo = function(point) {
+      var projection = this.project(point, true);
+      this.attrs.width = projection.x;
+      this.attrs.height = projection.y;
       this.save();
     }
 

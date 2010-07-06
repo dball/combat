@@ -1,13 +1,19 @@
 Combat.figures = {
   init: function(json) {
     var that = this;
-    this.all = $.map(json, function(json) { return new that.create(json); });
+    this.all = $.map(json, function(json) { return new that.build(json); });
     this.url = Combat.url + '/figures';
   },
 
   draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
 
-  create: function(json) {
+  create: function(attrs) {
+    var figure = new Combat.figures.build(attrs);
+    Combat.figures.all.push(figure);
+    figure.save();
+  },
+
+  build: function(json) {
     this.type = 'figure';
     this.attrs = {};
     this.tile = null;

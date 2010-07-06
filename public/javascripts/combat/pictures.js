@@ -76,6 +76,8 @@ Combat.pictures = {
 
     this.project = function(point) {
       var p = point.minus(this.attrs);
+      if (p.x < 1) { p.x = 1; }
+      if (p.y < 1) { p.y = 1; }
       var aspect = {
         required: this.attrs.width / this.attrs.height,
         actual: p.x / p.y

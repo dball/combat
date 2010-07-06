@@ -38,15 +38,12 @@ Combat.actions.register({
       this.current = null;
     }
   },
-  pixel: function(evt) {
-    return { x: evt.pageX, y: evt.pageY };
-  },
   points: {
     start: null,
     current: null
   },
   click: function(evt) {
-    this.points.current = Combat.map.point(this.pixel(evt));
+    this.points.current = Combat.map.point(evt);
     if (this.points.start == null) {
       this.shift = evt.shiftKey;
       this.points.start = this.points.current;
@@ -70,7 +67,7 @@ Combat.actions.register({
     Combat.draw();
   },
   mousemove: function(evt) {
-    this.points.current = Combat.map.point(this.pixel(evt));
+    this.points.current = Combat.map.point(evt);
     if (this.things.current) { Combat.draw(); }
   },
   keypress: function(evt) {

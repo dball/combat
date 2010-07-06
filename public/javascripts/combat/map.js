@@ -4,11 +4,11 @@ Combat.map = {
     this.context = this.canvas.getContext('2d');
   },
   tiles: {},
-  point: function(pixel) {
+  point: function(evt) {
     var position = $(Combat.map.canvas).position();
     return this.points.create({
-      x: Combat.map.viewport.left + (pixel.x - position.left) / this.tiles.size,
-      y: Combat.map.viewport.top + (pixel.y - position.top) / this.tiles.size
+      x: Combat.map.viewport.left + (evt.pageX - position.left) / this.tiles.size,
+      y: Combat.map.viewport.top + (evt.pageY - position.top) / this.tiles.size
     });
   },
   points:  {

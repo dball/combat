@@ -2,7 +2,6 @@ Combat.actions.register({
   trigger: ']',
   title: 'zoom in',
   begin: function(evt) {
-    console.log("begin zoom in", this, Combat);
     Combat.map.viewport.zoom('+');
     Combat.actions.stop(this);
   }

@@ -18,6 +18,7 @@ Combat.map = {
         x: point.x,
         y: point.y,
         minus: function(point) { return Combat.map.points.create({ x: this.x - point.x, y: this.y - point.y }); },
+        plus: function(point) { return Combat.map.points.create({ x: this.x + point.y, y: this.y + point.y }); },
         tile: {
           x: Math.floor(point.x),
           y: Math.floor(point.y),

@@ -85,7 +85,7 @@ Combat.pictures = {
       } else if (aspect.actual < aspect.required) {
         p.x = p.y * aspect.required;
       }
-      return Combat.map.points.create({ x: p.x + this.attrs.x, y: p.y + this.attrs.y });
+      return Combat.map.points.create({ x: p.x, y: p.y });
     }
 
     this.contains = function(point) {

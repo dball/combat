@@ -3,11 +3,15 @@ Combat.actions.register({
   title: 'select',
   begin: function(evt) { Combat.actions.active.click(evt); },
   end: function() {
+    this.clear();
+    Combat.draw();
+  },
+  clear: function() {
     this.index = null;
+    this.shift = null;
     this.things.clear();
     this.points.start = null;
     this.points.current = null;
-    Combat.draw();
   },
   things: {
     all: [],
@@ -44,27 +48,25 @@ Combat.actions.register({
   click: function(evt) {
     this.points.current = Combat.map.point(this.pixel(evt));
     if (this.points.start == null) {
+      this.shift = evt.shiftKey;
       this.points.start = this.points.current;
       var that = this;
-      var all = $.map(Combat.things(), function(thing) { return { thing: thing, offset: thing.contains(that.points.current) }; });
-      this.things.all = $.grep(all, function(props) { return props.offset; });
+      var all = this.shift ? Combat.pictures.all : Combat.things();
+      var contains = $.map(all, function(thing) { return { thing: thing, offset: thing.contains(that.points.current) }; });
+      this.things.all = $.grep(contains, function(props) { return props.offset; });
       this.things.next();
     } else if (this.points.start.tile.x == this.points.current.tile.x && this.points.start.tile.y == this.points.current.tile.y) {
       this.things.next();
     } else {
       var thing = this.things.current.thing;
-      if (thing.selected == 'shift') {
+      if (this.shift) {
         thing.resizeTo(this.points.current);
       } else {
         thing.move(this.points.current.minus(this.things.current.offset));
       }
       this.things.clear();
     }
-    if (this.things.current) {
-      if (evt.shiftKey) { this.things.current.thing.selected = 'shift'; }
-    } else {
-      Combat.actions.stop(this);
-    }
+    if (!this.things.current) { Combat.actions.stop(this); }
     Combat.draw();
   },
   mousemove: function(evt) {
@@ -100,7 +102,7 @@ Combat.actions.register({
     var current = this.things.current;
     if (current) {
       var thing = current.thing;
-      if (thing.selected == 'shift') {
+      if (this.shift) {
         thing.drawResizeHandle(context, this.points.current);
       } else {
         context.save();

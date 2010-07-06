@@ -51,9 +51,10 @@ Combat.figures = {
     }
 
     this.destroy = function() {
-      var index = Combat.figures.all.indexOf(this);
+      var all = Combat.figures.all;
+      var index = all.indexOf(this);
       if (index == null) { throw 'selected does not appear in the list of figures'; }
-      this.all.splice(index, 1);
+      all.splice(index, 1);
       $.ajax({ type: 'DELETE', url: this.url() });
     }
 

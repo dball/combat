@@ -36,19 +36,21 @@ Combat.pictures = {
       context.strokeRect(this.attrs.x, this.attrs.y, this.attrs.width, this.attrs.height);
     }
 
-    this.drawResizeHandle = function(context) {
+    this.drawResizeHandle = function(context, point) {
       context.save();
       context.translate(this.attrs.x, this.attrs.y);
+      var projected = this.project(point);
       var width = this.attrs.width;
       var height = this.attrs.height;
+
       context.lineWidth = Math.max(width * 0.01, height * 0.01, 0.1) / 2;
 
       context.strokeStyle = '#666';
-      context.strokeRect(0, 0, width, height);
+      context.strokeRect(0, 0, projected.x, projected.y);
 
       context.beginPath();
       context.moveTo(0, 0);
-      context.lineTo(width, height);
+      context.lineTo(projected.x, projected.y);
       context.stroke();
 
       context.strokeStyle = '#000';
@@ -66,7 +68,24 @@ Combat.pictures = {
       context.lineTo(width, height * 0.9);
       context.stroke();
 
+      context.globalAlpha = 0.5;
+      context.drawImage(this.img, 0, 0, projected.x, projected.y);
+
       context.restore();
+    }
+
+    this.project = function(point) {
+      var p = point.minus(this.attrs);
+      var aspect = {
+        required: this.attrs.width / this.attrs.height,
+        actual: p.x / p.y
+      }
+      if (aspect.actual > aspect.required) {
+        p.y = p.x / aspect.required;
+      } else if (aspect.actual < aspect.required) {
+        p.x = p.y * aspect.required;
+      }
+      return Combat.map.points.create({ x: p.x + this.attrs.x, y: p.y + this.attrs.y });
     }
 
     this.contains = function(point) {

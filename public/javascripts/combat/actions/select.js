@@ -52,7 +52,12 @@ Combat.actions.register({
     } else if (this.points.start.tile.x == this.points.current.tile.x && this.points.start.tile.y == this.points.current.tile.y) {
       this.things.next();
     } else {
-      this.things.current.thing.move(this.points.current.minus(this.things.current.offset));
+      var thing = this.things.current.thing;
+      if (thing.selected == 'shift') {
+        thing.resizeTo(this.points.current);
+      } else {
+        thing.move(this.points.current.minus(this.things.current.offset));
+      }
       this.things.clear();
     }
     if (this.things.current) {
@@ -96,7 +101,7 @@ Combat.actions.register({
     if (current) {
       var thing = current.thing;
       if (thing.selected == 'shift') {
-        thing.drawResizeHandle(context);
+        thing.drawResizeHandle(context, this.points.current);
       } else {
         context.save();
         context.lineWidth = 0.05;

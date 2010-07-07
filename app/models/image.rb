@@ -16,6 +16,10 @@ class Image < ActiveRecord::Base
   def url=(url)
   end
 
+  def aspect_ratio
+    image_width.to_f / image_height
+  end
+
   def points
     x && y && width && height ? [{ :x => x, :y => y }, { :x => x + width, :y => y + height }] : []
   end

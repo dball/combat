@@ -85,10 +85,15 @@ Combat.actions = {
               if (xhr.status == 201) {
                 var json = $.parseJSON(xhr.responseText);
                 var point = Combat.map.point(drop_event);
-                json.x = point.x;
-                json.y = point.y;
-                json.width = 1;
-                json.height = 1;
+                json.x = point.tile.x;
+                json.y = point.tile.y;
+                if (json.aspect_ratio < 1) {
+                  json.width = 1;
+                  json.height = 1 / json.aspect_ratio;
+                } else {
+                  json.width = json.aspect_ratio;
+                  json.height = 1;
+                }
                 Combat.pictures.create(json);
                 Combat.draw();
               } else {

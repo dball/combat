@@ -9,9 +9,11 @@ class ImagesController < ApplicationController
 
   def create
     image = map.images.build(:blob => request.raw_post)
+    geo = Paperclip::Geometry.from_file(image.image.to_file)
+    image.attributes=({ :image_width => geo.width, :image_height => geo.height })
     image.image_content_type = request.content_type
     if image.save
-      render :json => image.to_json(:methods => :url), :status => :created
+      render :json => image.to_json(:methods => [:url, :aspect_ratio]), :status => :created
     else
       head :error
     end

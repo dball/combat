@@ -21,6 +21,10 @@ class ImagesController < ApplicationController
     head(image.update_attributes(params[:image]) ? :no_content : :error)
   end
 
+  def destroy
+    head(image.destroy ? :no_content : :error)
+  end
+
   private
 
   def image

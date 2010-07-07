@@ -146,7 +146,7 @@ Combat.pictures = {
     this.destroy = function() {
       var index = Combat.pictures.all.indexOf(this);
       if (index == null) { throw 'selected does not appear in the list of pictures'; }
-      this.all.splice(index, 1);
+      Combat.pictures.all.splice(index, 1);
       $.ajax({ type: 'DELETE', url: this.url() });
     }
     /*

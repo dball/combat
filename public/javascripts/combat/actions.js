@@ -66,14 +66,14 @@ Combat.actions = {
     document.addEventListener("dragover", function(event) {
       event.preventDefault();
     }, true);
-    document.addEventListener("drop", function(event) {
-      event.preventDefault();
-      var dt = event.dataTransfer;
+    document.addEventListener("drop", function(drop_event) {
+      drop_event.preventDefault();
+      var dt = drop_event.dataTransfer;
       var files = dt.files;
       for (var i = 0; i < files.length; i++) {
         var file = files[i];
         var reader = new FileReader();  
-        reader.onload = function(event) {
+        reader.onload = function(load_event) {
           var xhr = new XMLHttpRequest();  
           xhr.open("POST", Combat.url + "/images", true);  
           xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -84,8 +84,9 @@ Combat.actions = {
             if (xhr.readyState == 4) {  
               if (xhr.status == 201) {
                 var json = $.parseJSON(xhr.responseText);
-                json.x = 0;
-                json.y = 0;
+                var point = Combat.map.point(drop_event);
+                json.x = point.x;
+                json.y = point.y;
                 json.width = 1;
                 json.height = 1;
                 Combat.pictures.create(json);

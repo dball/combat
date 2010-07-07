@@ -30,6 +30,7 @@ Combat.figures = {
     var figure = new Combat.figures.build(attrs);
     Combat.figures.all.push(figure);
     figure.save();
+    return figure;
   },
 
   build: function(json) {

@@ -82,7 +82,7 @@ Combat.map = {
     },
     pan: function(direction, axis) {
       var that = this;
-      $.ajax({ type: 'POST', url: url + "/pan",
+      $.ajax({ type: 'POST', url: Combat.url + "/pan",
         data: { direction: direction, axis: axis },
         success: function(results) { that.load(results); }
       });

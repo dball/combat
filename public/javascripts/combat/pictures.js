@@ -1,13 +1,20 @@
 Combat.pictures = {
   init: function(json) {
     var that = this;
-    this.all = $.map(json, function(json) { return new that.create(json); });
+    this.all = $.map(json, function(json) { return new that.build(json); });
     this.url = Combat.url + '/images';
   },
 
   draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
 
-  create: function(json) {
+  create: function(attrs) {
+    var picture = new Combat.pictures.build(attrs);
+    Combat.pictures.all.push(picture);
+    picture.save();
+    return picture;
+  },
+
+  build: function(json) {
     this.attrs = {};
     this.tile = null;
     this.fields = ['x', 'y', 'width', 'height', 'url'];
@@ -149,19 +156,6 @@ Combat.pictures = {
       Combat.pictures.all.splice(index, 1);
       $.ajax({ type: 'DELETE', url: this.url() });
     }
-    /*
-
-    this.enlarge = function() {
-      var that = this;
-      $.ajax({ type: 'POST', url: this.url('enlarge'), success: function(results) { that.load(results); Combat.draw(); } });
-    }
-
-    this.reduce = function() {
-      var that = this;
-      $.ajax({ type: 'POST', url: this.url('reduce'), success: function(results) { that.load(results); Combat.draw(); } });
-    }
-
-    */
 
     this.load(json, 'id');
   }

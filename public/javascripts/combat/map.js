@@ -27,6 +27,33 @@ Combat.map = {
         },
       }
     },
+    line: function(t0, t1) {
+      var results = [];
+      var x0 = t0.x, y0 = t0.y, x1 = t1.x, y1 = t1.y, tmp;
+      var steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
+      if (steep) {
+        tmp = x0; x0 = y0; y0 = tmp;
+        tmp = x1; x1 = y1; y1 = tmp;
+      }
+      if (x0 > x1) {
+        tmp = x0; x0 = x1; x1 = tmp;
+        tmp = y0; y0 = y1; y1 = tmp;
+      }
+      var dx = x1 - x0;
+      var dy = Math.abs(y1 - y0);
+      var error = dx / 2;
+      var y = y0;
+      var ystep = (y0 < y1 ? 1 : -1);
+      for (var x = x0; x <= x1; x++) {
+        results.push(steep ? { x: y, y: x } : { x: x, y: y });
+        error = error - dy
+        if (error < 0) {
+          y = y + ystep
+          error = error + dx
+        }
+      }
+      return $.map(results, function(attrs) { return Combat.map.points.create(attrs); });
+    }
   },
   draw: function() {
     var context = this.context;

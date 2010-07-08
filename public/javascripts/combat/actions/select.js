@@ -102,11 +102,25 @@ Combat.actions.register({
       if (this.shift) {
         thing.drawResizeHandle(context, this.points.current);
       } else {
+        var point = this.points.current.minus(current.offset);
+
+        if (thing.type == 'figure') {
+          context.save();
+          context.fillStyle = 'rgba(0, 0, 0, 0.6)';
+          var scale = thing.scale();
+          var points = Combat.map.points.line(thing.tile, point.tile);
+          if (points.length > 2) {
+            points.shift();
+            points.pop();
+            $.each(points, function() { context.fillRect(this.x, this.y, scale, scale); });
+          }
+          context.restore();
+        }
+
         context.save();
         context.lineWidth = 0.05;
         thing.drawBorder(context);
         context.globalAlpha = 0.5;
-        var point = this.points.current.minus(current.offset);
         context.translate(point.tile.x - thing.tile.x, point.tile.y - thing.tile.y);
         thing.draw(context);
         thing.drawBorder(context);

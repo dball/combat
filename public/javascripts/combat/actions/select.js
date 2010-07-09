@@ -49,7 +49,7 @@ Combat.actions.register({
       this.points.start = this.points.current;
       var that = this;
       var all = this.shift ? Combat.pictures.all : Combat.things();
-      var contains = $.map(all, function(thing) { return { thing: thing, offset: thing.contains(that.points.current) }; });
+      var contains = $.map(all, function(thing) { return { thing: thing, offset: thing.contains(that.points.current, evt) }; });
       this.things.all = $.grep(contains, function(props) { return props.offset; });
       this.things.next();
     } else if (this.points.start.tile.x == this.points.current.tile.x && this.points.start.tile.y == this.points.current.tile.y) {

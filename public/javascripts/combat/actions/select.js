@@ -109,11 +109,44 @@ Combat.actions.register({
           context.fillStyle = 'rgba(0, 0, 0, 0.6)';
           var scale = thing.scale();
           var points = Combat.map.points.line(thing.tile, point.tile);
+          var distance = 0;
+          var dmod = 0;
+          for (var p = points[0], i = 1, l = points.length; i < l; i++) {
+            var pi = points[i];
+            if (p.x != pi.x && p.y != pi.y) {
+              if (dmod == 0) { dmod = 1; distance += 5; } else { dmod = 0; distance += 10; }
+            } else {
+              distance += 5;
+            }
+          }
           if (points.length > 2) {
             points.shift();
             points.pop();
             $.each(points, function() { context.fillRect(this.x, this.y, scale, scale); });
           }
+          context.restore();
+
+          context.save();
+          context.translate(this.points.current.x, this.points.current.y);
+          var pixel_scale = 1 / Combat.map.tiles.size;
+          context.scale(pixel_scale, pixel_scale);
+          context.translate(0, 30);
+
+          context.save();
+          context.fillStyle = 'rgba(244, 247, 156, 1)';
+          var x = -26, y = -12, w = 52, h = 24;
+          context.fillRect(x, y, w, h);
+          context.strokeStyle = '#333';
+          context.strokeRect(x, y, w, h);
+          context.restore();
+
+          context.save();
+          context.font = '18px helvetica';
+          context.textAlign = 'center';
+          context.textBaseline = 'middle';
+          context.fillText('' + distance + ' ft', 0, 0);
+          context.restore();
+
           context.restore();
         }
 

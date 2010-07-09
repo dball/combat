@@ -106,7 +106,7 @@ Combat.actions.register({
 
         if (thing.type == 'figure') {
           context.save();
-          context.fillStyle = 'rgba(0, 0, 0, 0.6)';
+          context.fillStyle = 'rgba(10, 10, 10, 0.5)';
           var scale = thing.scale();
           var points = Combat.map.points.line(thing.tile, point.tile);
           var distance = 0;

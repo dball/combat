@@ -3,6 +3,7 @@ class Wall < ActiveRecord::Base
   has_many :vertices, :dependent => :destroy
 
   def vertex_values=(values)
+    return if values.empty?
     vertices.clear
     values.values.each {|vertex| vertices.build(vertex.slice(:x, :y)) }
   end

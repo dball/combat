@@ -21,9 +21,6 @@ Combat.walls = {
 
     this.load = function(json) {
       var that = this;
-      this.vertices = json.vertices;
-      this.tile = json.vertices[0];
-      var that = this;
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
       $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
@@ -38,7 +35,7 @@ Combat.walls = {
 
     this.params = function() {
       var params = {};
-      params['wall[vertex_values]'] = this.vertices;
+      params['wall[vertex_values]'] = $.map(this.attrs.vertices, function(vertex) { return { x: vertex.x, y: vertex.y }; });
       return params;
     }
 
@@ -53,13 +50,13 @@ Combat.walls = {
 
     this.move = function(point) {
       var offset = { x: point.tile.x - this.tile.x, y: point.tile.y - this.tile.y };
-      $.each(this.vertices, function() { this.x += offset.x; this.y += offset.y; });
+      $.each(this.attrs.vertices, function() { this.x += offset.x; this.y += offset.y; });
       this.save();
     }
 
     this.contains = function(point, evt) {
-      for (var i=0, l = this.vertices.length; i < l; i++) {
-        var v = this.vertices[i];
+      for (var i=0, l = this.attrs.vertices.length; i < l; i++) {
+        var v = this.attrs.vertices[i];
         if (Math.sqrt(Math.pow(point.x - v.x, 2) + Math.pow(point.y - v.y, 2)) < 0.25) {
           return { x: point.x - this.tile.x, y: point.y - this.tile.y };
         }
@@ -74,9 +71,9 @@ Combat.walls = {
       if (this.attrs.vertices.length <= 1) { return; }
       context.save();
       context.lineWidth = lineWidth
-      var v = this.vertices[0];
+      var v = this.attrs.vertices[0];
       context.beginPath(v.x, v.y);
-      for (var i=1, l=this.vertices.length; i < l; i++) { v = this.vertices[i]; context.lineTo(v.x, v.y); }
+      for (var i=1, l=this.attrs.vertices.length; i < l; i++) { v = this.attrs.vertices[i]; context.lineTo(v.x, v.y); }
       context.stroke();
       context.restore();
     }

@@ -22,7 +22,6 @@ Combat.map = {
         tile: {
           x: Math.floor(point.x),
           y: Math.floor(point.y),
-          equals: function(tile) { return this.x == tile.x && this.y == this.y; },
           minus: function(tile) { return Combat.map.points.create({ x: this.x - tile.x, y: this.y - tile.y }).tile; }
         },
       }

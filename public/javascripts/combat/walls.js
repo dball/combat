@@ -24,6 +24,7 @@ Combat.walls = {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
       $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
+      this.tile = this.attrs.vertices[0];
     }
 
     this.url = function() {
@@ -46,6 +47,14 @@ Combat.walls = {
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
+    }
+
+    this.destroy = function() {
+      var all = Combat.walls.all;
+      var index = all.indexOf(this);
+      if (index == null) { throw 'selected does not appear in the list of walls'; }
+      all.splice(index, 1);
+      $.ajax({ type: 'DELETE', url: this.url() });
     }
 
     this.move = function(point) {
@@ -72,8 +81,12 @@ Combat.walls = {
       context.save();
       context.lineWidth = lineWidth
       var v = this.attrs.vertices[0];
-      context.beginPath(v.x, v.y);
-      for (var i=1, l=this.attrs.vertices.length; i < l; i++) { v = this.attrs.vertices[i]; context.lineTo(v.x, v.y); }
+      context.beginPath();
+      context.moveTo(v.x, v.y);
+      for (var i=1, l=this.attrs.vertices.length; i < l; i++) {
+        v = this.attrs.vertices[i];
+        context.lineTo(v.x, v.y);
+      }
       context.stroke();
       context.restore();
     }

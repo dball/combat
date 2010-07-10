@@ -12,6 +12,10 @@ class WallsController < ApplicationController
     head(wall.update_attributes(params[:wall]) ? :no_content : :error)
   end
 
+  def destroy
+    head(wall.destroy ? :no_content : :error)
+  end
+
   private
 
   def wall

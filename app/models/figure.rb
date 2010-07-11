@@ -1,6 +1,17 @@
 class Figure < ActiveRecord::Base
   SIZES = %w(fine diminuitive tiny small medium large huge gargantuan colossal)
   SIZE_CODES = SIZES.map {|s| s[0, 1].upcase }
+  SCALES = {
+    'F' => 1,
+    'D' => 1,
+    'T' => 1,
+    'S' => 1,
+    'M' => 1,
+    'L' => 2,
+    'H' => 3,
+    'G' => 4,
+    'C' => 6
+  }
 
   belongs_to :map
   belongs_to :character
@@ -18,7 +29,8 @@ class Figure < ActiveRecord::Base
   end
 
   def points
-    [{ :x => x, :y => y }]
+    scale = SCALES[size]
+    [{ :x => x, :y => y }, { :x => x + scale, :y => y + scale }]
   end
 
   def enlarge

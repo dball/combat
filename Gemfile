@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
-gem "rails", :git => "git://github.com/rails/rails.git", :tag => 'v3.0.0.beta3'
+#gem "rails", :git => "git://github.com/rails/rails.git", :tag => 'v3.0.0.beta3'
+gem 'rails', :path => File.join(File.dirname(__FILE__), '/vendor/gems/rails')
 gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'pg'
 gem 'ruby-debug', :group => :development
@@ -9,4 +10,5 @@ gem 'database_cleaner', :git => 'git://github.com/bmabey/database_cleaner.git', 
 gem 'cucumber-rails',   :git => 'git://github.com/aslakhellesoy/cucumber-rails.git', :group => :test
 gem "rspec-rails", :git => 'git://github.com/rspec/rspec-rails.git', :group => :test
 gem 'aws-s3'
-gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
+#gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
+gem 'paperclip', :path => File.join(File.dirname(__FILE__), '/vendor/gems/paperclip')

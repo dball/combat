@@ -118,6 +118,7 @@ Combat.actions.register({
             } else {
               distance += 5;
             }
+            p = pi;
           }
           if (points.length > 2) {
             points.shift();

@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem "rails", :git => "git://github.com/rails/rails.git", :tag => 'v3.0.0.beta.3'
+gem "rails", :git => "git://github.com/rails/rails.git", :tag => 'v3.0.0.beta3'
 gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'pg'
 gem 'ruby-debug', :group => :development

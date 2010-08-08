@@ -123,7 +123,7 @@ Combat.figures = {
       context.scale(0.1, 0.1);
       var scale = this.scale() * 10;
       var offset = scale / 2;
-      context.font = '' + scale + 'px fixed';
+      context.font = '' + scale + 'px sans-serif';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.fillText(this.attrs.letter, offset, offset);

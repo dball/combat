@@ -1,6 +1,8 @@
 Combat.map = {
   init: function(json, id, viewport_id) {
     this.canvas = document.getElementById(id);
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d');
   },
   tiles: {},

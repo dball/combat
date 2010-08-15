@@ -57,15 +57,28 @@ Combat.actions = {
       }
     }
   },
+  gesturechange: function(evt) {
+  },
+  gesturestart: function(evt) {
+  },
+  gestureend: function(evt) {
+  },
   bind: function(element) {
     element.click(this.click);
     element.mousemove(this.mousemove);
     element.mousedown(this.mousedown);
     element.mouseup(this.mouseup);
     $(document).keypress(this.keypress);
-    document.addEventListener("dragover", function(event) {
-      event.preventDefault();
-    }, true);
+    /*
+    element.addEventListener('gesturestart', this.gesturestart, false);
+    element.addEventListener('gesturechange', this.gesturechange, false);
+    element.addEventListener('gestureend', this.gestureend, false);
+    */
+    /*
+    document.addEventListener('touchmove', function(event) { event.preventDefault(); });
+    document.addEventListener('touchstart', function(event) { event.preventDefault(); });
+    */
+    document.addEventListener("dragover", function(event) { event.preventDefault(); }, true);
     document.addEventListener("drop", function(drop_event) {
       drop_event.preventDefault();
       var dt = drop_event.dataTransfer;

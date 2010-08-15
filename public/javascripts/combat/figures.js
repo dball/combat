@@ -118,16 +118,22 @@ Combat.figures = {
     }
 
     this.drawLetter = function(context) {
-      context.save();
+      var scale = this.scale();
+      var font_size = scale * 0.7;
+      var text_width = get_textWidth(this.attrs.letter, font_size);
+      context.strokeText(this.attrs.letter, (scale - text_width) / 2, 0, font_size);
+      // iPad OS 3.0 doesn't support native canvas fillText, so we use the strokeText.js library instead
+      /*
       // Firefox and Safari were both having issues with 1px fonts, so we scale by 10 as a workaround
       context.scale(0.1, 0.1);
       var scale = this.scale() * 10;
       var offset = scale / 2;
-      context.font = '' + scale + 'px sans-serif';
+      context.font = '' + scale + 'px courier';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.fillText(this.attrs.letter, offset, offset);
       context.restore();
+      */
     }
 
     this.drawBorder = function(context) {

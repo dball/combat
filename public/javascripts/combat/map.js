@@ -4,6 +4,8 @@ Combat.map = {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d');
+    // Decorate canvas with strokeText mixin
+    set_textRenderContext(this.context);
   },
   tiles: {},
   point: function(evt) {

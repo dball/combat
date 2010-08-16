@@ -12,7 +12,7 @@
   </div>
   <%= javascript_tag do %>
     $(function() {
-      Combat.init(<%= @json.html_safe %>, 'map', 'viewport', 'actions');
+      Combat.init(<%= @json.html_safe %>, 'map', 'viewport', 'controls');
     });
   <% end %>
 </section>

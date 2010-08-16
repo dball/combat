@@ -1,14 +1,25 @@
 Combat.actions.register({
   trigger: {
     key: 'c',
-    control: 'create_figure'
+    control: 'create figure'
   },
   title: 'create figure',
   size: 'M',
-  begin: function(evt) {},
+  begin: function(evt) {
+  },
   end: function(evt) {
     this.point = null;
     Combat.draw();
+  },
+  bind: function(control) {
+    this.control = control;
+    var action = this;
+    control.find('button').click(function(evt) {
+      if (!action.letter) {
+        action.letter = control.find('input').val();
+      }
+      Combat.actions.start(action, evt);
+    });
   },
   keypress: function(evt) {
     ch = String.fromCharCode(evt.charCode);
@@ -18,6 +29,9 @@ Combat.actions.register({
       this.size = Combat.figures.sizes.smaller(this.size);
     } else {
       this.letter = ch;
+    }
+    if (this.control) {
+      this.control.find('input').val(this.letter);
     }
     Combat.draw();
   },

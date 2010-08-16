@@ -3,7 +3,8 @@ Combat.actions = {
   controls: null,
   triggers: {
     keys: {},
-    mouse: {}
+    mouse: {},
+    controls: [],
   },
   draw: function(context) {
     if (this.active && this.active.draw) { this.active.draw(context); }
@@ -14,6 +15,9 @@ Combat.actions = {
     }
     if (action.trigger.key) {
       this.triggers.keys[action.trigger.key] = action;
+    }
+    if (action.trigger.control) {
+      this.triggers.controls.push(action);
     }
   },
   stop: function(action) {
@@ -71,13 +75,11 @@ Combat.actions = {
     canvas.mousedown(this.mousedown);
     canvas.mouseup(this.mouseup);
     $(document).keypress(this.keypress);
-    this.controls = controls;
+    $.each(this.triggers.controls, function() { this.bind(controls.find("*[data-control='" + this.trigger.control + "']")); });
     /*
-    element.addEventListener('gesturestart', this.gesturestart, false);
-    element.addEventListener('gesturechange', this.gesturechange, false);
-    element.addEventListener('gestureend', this.gestureend, false);
-    */
-    /*
+    document.addEventListener('gesturestart', this.gesturestart, false);
+    document.addEventListener('gesturechange', this.gesturechange, false);
+    document.addEventListener('gestureend', this.gestureend, false);
     document.addEventListener('touchmove', function(event) { event.preventDefault(); });
     document.addEventListener('touchstart', function(event) { event.preventDefault(); });
     */

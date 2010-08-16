@@ -1,5 +1,8 @@
 Combat.actions.register({
-  trigger: 'c',
+  trigger: {
+    key: 'c',
+    control: 'create_figure'
+  },
   title: 'create figure',
   size: 'M',
   begin: function(evt) {},

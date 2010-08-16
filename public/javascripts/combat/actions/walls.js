@@ -1,5 +1,5 @@
 Combat.actions.register({
-  trigger: 'd',
+  trigger: { key: 'd' },
   title: 'draw wall',
   begin: function(evt) {
     this.vertices = [];

@@ -1,5 +1,5 @@
 Combat.actions.register({
-  trigger: ']',
+  trigger: { key: ']' },
   title: 'zoom in',
   begin: function(evt) {
     Combat.map.viewport.zoom('+');
@@ -8,7 +8,7 @@ Combat.actions.register({
 });
 
 Combat.actions.register({
-  trigger: '[',
+  trigger: { key: '[' },
   title: 'zoom out',
   begin: function(evt) {
     Combat.map.viewport.zoom('-');
@@ -17,7 +17,7 @@ Combat.actions.register({
 });
 
 Combat.actions.register({
-  trigger: '=',
+  trigger: { key: '=' },
   title: 'reset viewport',
   begin: function(evt) {
     Combat.map.viewport.reset();
@@ -26,28 +26,28 @@ Combat.actions.register({
 });
 
 Combat.actions.register({
-  trigger: KeyEvent.DOM_VK_LEFT,
+  trigger: { key: KeyEvent.DOM_VK_LEFT },
   begin: function(evt) {
     Combat.map.viewport.pan('-', 'x');
     Combat.actions.stop(this);
   }
 });
 Combat.actions.register({
-  trigger: KeyEvent.DOM_VK_RIGHT,
+  trigger: { key: KeyEvent.DOM_VK_RIGHT },
   begin: function(evt) {
     Combat.map.viewport.pan('+', 'x');
     Combat.actions.stop(this);
   }
 });
 Combat.actions.register({
-  trigger: KeyEvent.DOM_VK_UP,
+  trigger: { key: KeyEvent.DOM_VK_UP },
   begin: function(evt) {
     Combat.map.viewport.pan('-', 'y');
     Combat.actions.stop(this);
   }
 });
 Combat.actions.register({
-  trigger: KeyEvent.DOM_VK_DOWN,
+  trigger: { key: KeyEvent.DOM_VK_DOWN },
   begin: function(evt) {
     Combat.map.viewport.pan('+', 'y');
     Combat.actions.stop(this);

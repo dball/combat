@@ -11,8 +11,9 @@ Combat.actions = {
   register: function(action) {
     if (action.trigger.mouse) {
       this.triggers.mouse[action.trigger.mouse] = action;
-    } else {
-      this.triggers.keys[action.trigger] = action;
+    }
+    if (action.trigger.key) {
+      this.triggers.keys[action.trigger.key] = action;
     }
   },
   stop: function(action) {

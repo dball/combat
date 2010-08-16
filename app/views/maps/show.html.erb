@@ -1,63 +1,18 @@
 <section id="combat">
-  <div id="controls">
-    <%= button_to('New Map', maps_path) %>
-    <dl>
-      <dt>c</dt>
-      <dd>
-        Create figure
-        <dl>
-          <dt>any key</dt>
-          <dd>store key in buffer</dd>
-          <dt>click</dt>
-          <dd>draw buffered key</dd>
-        </dl>
-      </dd>
-      <dt>d</dt>
-      <dd>
-        Draw path
-        <dl>
-          <dt>click</dt>
-          <dd>add point to path</dd>
-        </dl>
-      </dd>
-      <dt>click</dt>
-      <dd>
-        select character
-        <dl>
-          <dt>click</dt>
-          <dd>move</dd>
-          <dt>[</dt>
-          <dd>reduce</dd>
-          <dt>]</dt>
-          <dd>enlarge</dd>
-          <dt>backspace</dt>
-          <dd>remove</dd>
-        </dl>
-      </dd>
-      <dt>[</dt>
-      <dd>zoom in</dd>
-      <dt>]</dt>
-      <dd>zoom out</dd>
-      <dt>left</dt>
-      <dd>pan left</dd>
-      <dt>right</dt>
-      <dd>pan right</dd>
-      <dt>up</dt>
-      <dd>pan up</dd>
-      <dt>down</dt>
-      <dd>pan down</dd>
-      <dt>=</dt>
-      <dd>reset viewport</dd>
-      <dt>escape</dt>
-      <dd>end action</dd>
-    </dl>
+  <div id="sidebar">
+    <ul id="controls">
+      <li><%= button_to('New Map', maps_path) %></li>
+      <li data-control="create figure"><button>Figure</button> <input type="text" size="1" maxlength="1" value="X"></li>
+      <li data-control="draw wall"><button>Wall</button></li>
+    </ul>
+    <div id="trashcan"></div>
   </div>
   <div id="viewport">
     <canvas id="map"></canvas>
   </div>
   <%= javascript_tag do %>
     $(function() {
-      Combat.init(<%= @json.html_safe %>, 'map', 'viewport');
+      Combat.init(<%= @json.html_safe %>, 'map', 'viewport', 'actions');
     });
   <% end %>
 </section>

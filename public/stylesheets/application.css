@@ -7,10 +7,9 @@ body {
   width: 100%;
 }
 
-#combat #controls {
-  /* display: table-cell; */
-  display: none;
-  width: 12em;
+#combat #sidebar {
+  display: table-cell;
+  width: 10em;
   vertical-align: top;
   padding: 1em;
 }

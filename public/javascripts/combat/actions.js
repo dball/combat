@@ -1,5 +1,6 @@
 Combat.actions = {
   active: null,
+  controls: null,
   triggers: {
     keys: {},
     mouse: {}
@@ -63,12 +64,13 @@ Combat.actions = {
   },
   gestureend: function(evt) {
   },
-  bind: function(element) {
-    element.click(this.click);
-    element.mousemove(this.mousemove);
-    element.mousedown(this.mousedown);
-    element.mouseup(this.mouseup);
+  bind: function(canvas, controls) {
+    canvas.click(this.click);
+    canvas.mousemove(this.mousemove);
+    canvas.mousedown(this.mousedown);
+    canvas.mouseup(this.mouseup);
     $(document).keypress(this.keypress);
+    this.controls = controls;
     /*
     element.addEventListener('gesturestart', this.gesturestart, false);
     element.addEventListener('gesturechange', this.gesturechange, false);

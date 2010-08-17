@@ -76,6 +76,9 @@ Combat.actions = {
     canvas.mouseup(this.mouseup);
     $(document).keypress(this.keypress);
     $.each(this.triggers.controls, function() { this.bind(controls.find("*[data-control='" + this.trigger.control + "']")); });
+    $(window).resize(function() {
+      Combat.map.resize(true);
+    });
     /*
     document.addEventListener('gesturestart', this.gesturestart, false);
     document.addEventListener('gesturechange', this.gesturechange, false);

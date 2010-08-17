@@ -1,11 +1,19 @@
 Combat.map = {
   init: function(json, id, viewport_id) {
     this.canvas = document.getElementById(id);
-    this.canvas.width = $('#viewport').width();
-    this.canvas.height = window.innerHeight;
+    this.resize(false);
     this.context = this.canvas.getContext('2d');
     // Decorate canvas with strokeText mixin
     set_textRenderContext(this.context);
+  },
+  resize: function(reset) {
+    this.canvas.width = $('#viewport').width();
+    this.canvas.height = window.innerHeight;
+    if (reset) {
+      if (this.reset_timeout) { clearTimeout(this.reset_timeout); }
+      var that = this;
+      this.reset_timeout = setTimeout(function() { that.viewport.reset(); that.reset_timeout = null; }, 100);
+    }
   },
   tiles: {},
   point: function(evt) {

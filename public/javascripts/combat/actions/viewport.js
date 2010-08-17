@@ -17,6 +17,15 @@ Combat.actions.register({
 });
 
 Combat.actions.register({
+  trigger: { mouse: 'wheel' },
+  title: 'zoom',
+  begin: function(evt, delta) {
+    Combat.map.viewport.zoom(delta > 0 ? '+' : '-');
+    Combat.actions.stop(this);
+  }
+});
+
+Combat.actions.register({
   trigger: { key: '=' },
   title: 'reset viewport',
   begin: function(evt) {

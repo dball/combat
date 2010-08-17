@@ -28,7 +28,8 @@ Combat.actions = {
   start: function(action, evt) {
     if (this.active) { throw 'You cannot start multiple actions at once'; }
     this.active = action;
-    action.begin(evt);
+    var args = Array.prototype.slice.call(arguments);
+    action.begin.apply(action, args.slice(1));
   },
   click: function(evt) {
     var action = Combat.actions.active;
@@ -49,6 +50,14 @@ Combat.actions = {
   mouseup: function(evt) {
     var action = Combat.actions.active;
     if (action && action.mouseup) { action.mouseup(evt); }
+  },
+  mousewheel: function(evt, delta) {
+    var action = Combat.actions.active;
+    if (action) {
+      if (action.mousewheel) { action.mousewheel(evt, delta); }
+    } else if (action = Combat.actions.triggers.mouse.wheel) {
+      Combat.actions.start(action, evt, delta);
+    }
   },
   keypress: function(evt) {
     var action = Combat.actions.active;
@@ -74,6 +83,7 @@ Combat.actions = {
     canvas.mousemove(this.mousemove);
     canvas.mousedown(this.mousedown);
     canvas.mouseup(this.mouseup);
+    canvas.mousewheel(this.mousewheel);
     $(document).keypress(this.keypress);
     $.each(this.triggers.controls, function() { this.bind(controls.find("*[data-control='" + this.trigger.control + "']")); });
     $(window).resize(function() {

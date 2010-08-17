@@ -22,8 +22,8 @@ Combat.actions = {
   },
   stop: function(action) {
     if (action && (action != this.active)) { console.log("stop", action, this.active, this); throw 'You can only stop the active action'; }
+    if (this.active && this.active.end) { this.active.end(); }
     this.active = null;
-    if (action.end) { action.end(); }
   },
   start: function(action, evt) {
     if (this.active) { throw 'You cannot start multiple actions at once'; }

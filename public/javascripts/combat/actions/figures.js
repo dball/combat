@@ -6,19 +6,27 @@ Combat.actions.register({
   title: 'create figure',
   size: 'M',
   begin: function(evt) {
+    if (this.control) { console.log("activate"); this.control.addClass('active'); }
+    Combat.draw();
   },
   end: function(evt) {
     this.point = null;
+    if (this.control) {
+      this.control.removeClass('active');
+      this.control.find('input').val(this.letter);
+    }
     Combat.draw();
   },
   bind: function(control) {
     this.control = control;
     var action = this;
     control.find('button').click(function(evt) {
-      if (!action.letter) {
-        action.letter = control.find('input').val();
+      if (Combat.actions.active == null) {
+        if (!action.letter) { action.letter = control.find('input').val(); }
+        Combat.actions.start(action, evt);
+      } else if (Combat.actions.active == action) {
+        Combat.actions.stop(action);
       }
-      Combat.actions.start(action, evt);
     });
   },
   keypress: function(evt) {

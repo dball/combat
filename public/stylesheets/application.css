@@ -14,10 +14,10 @@ body {
   padding: 1em;
 }
 
-#combat #viewport {
-  display: table-cell;
+#combat #controls .active button {
+  background-color: green;
 }
 
-#combat #controls dl > dd {
-  display: none;
+#combat #viewport {
+  display: table-cell;
 }

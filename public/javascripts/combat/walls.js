@@ -24,7 +24,7 @@ Combat.walls = {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
       $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
-      this.tile = this.attrs.vertices[0];
+      if (this.attrs.vertices) { this.tile = this.attrs.vertices[0]; }
     }
 
     this.url = function() {
@@ -77,7 +77,7 @@ Combat.walls = {
     }
 
     this.drawVertices = function(context, lineWidth) {
-      if (this.attrs.vertices.length <= 1) { return; }
+      if (!this.attrs.vertices || this.attrs.vertices.length <= 1) { return; }
       context.save();
       context.lineWidth = lineWidth
       var v = this.attrs.vertices[0];

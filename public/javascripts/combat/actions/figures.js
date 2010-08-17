@@ -6,7 +6,7 @@ Combat.actions.register({
   title: 'create figure',
   size: 'M',
   begin: function(evt) {
-    if (this.control) { console.log("activate"); this.control.addClass('active'); }
+    if (this.control) { this.control.addClass('active'); }
     Combat.draw();
   },
   end: function(evt) {

@@ -79,6 +79,11 @@ Combat.actions.register({
     this.points.offscreen = false;
     if (this.things.current) { Combat.draw(); }
   },
+  mousewheel: function(evt, delta) {
+    var current = this.things.current;
+    if (delta < 0) { current.thing.enlarge(); } else { current.thing.reduce(); }
+    Combat.draw();
+  },
   keypress: function(evt) {
     var current = this.things.current;
     if (current != null) {

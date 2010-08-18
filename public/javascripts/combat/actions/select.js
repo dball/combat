@@ -98,8 +98,10 @@ Combat.actions.register({
   },
   mousewheel: function(evt, delta) {
     var current = this.things.current;
-    if (delta < 0) { current.thing.enlarge(); } else { current.thing.reduce(); }
-    Combat.draw();
+    if (current && current.thing.enlarge) {
+      if (delta < 0) { current.thing.enlarge(); } else { current.thing.reduce(); }
+      Combat.draw();
+    }
   },
   keypress: function(evt) {
     var current = this.things.current;

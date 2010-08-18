@@ -51,6 +51,14 @@ Combat.actions = {
     var action = Combat.actions.active;
     if (action && action.mouseup) { action.mouseup(evt); }
   },
+  mouseenter: function(evt) {
+    var action = Combat.actions.active;
+    if (action && action.mouseenter) { action.mouseenter(evt); }
+  },
+  mouseleave: function(evt) {
+    var action = Combat.actions.active;
+    if (action && action.mouseleave) { action.mouseleave(evt); }
+  },
   mousewheel: function(evt, delta) {
     var action = Combat.actions.active;
     if (action) {
@@ -84,6 +92,8 @@ Combat.actions = {
     canvas.mousedown(this.mousedown);
     canvas.mouseup(this.mouseup);
     canvas.mousewheel(this.mousewheel);
+    canvas.mouseenter(this.mouseenter);
+    canvas.mouseleave(this.mouseleave);
     $(document).keypress(this.keypress);
     $.each(this.triggers.controls, function() { this.bind(controls.find("*[data-control='" + this.trigger.control + "']")); });
     $(window).resize(function() {

@@ -39,6 +39,7 @@ Combat.actions.register({
     }
   },
   points: {
+    offscreen: false,
     start: null,
     current: null
   },
@@ -68,6 +69,14 @@ Combat.actions.register({
   },
   mousemove: function(evt) {
     this.points.current = Combat.map.point(evt);
+    if (this.things.current) { Combat.draw(); }
+  },
+  mouseleave: function(evt) {
+    this.points.offscreen = true;
+    if (this.things.current) { Combat.draw(); }
+  },
+  mouseenter: function(evt) {
+    this.points.offscreen = false;
     if (this.things.current) { Combat.draw(); }
   },
   keypress: function(evt) {
@@ -104,7 +113,7 @@ Combat.actions.register({
       } else {
         var point = this.points.current.minus(current.offset);
 
-        if (thing.type == 'figure') {
+        if (thing.type == 'figure' && !this.points.offscreen) {
           context.save();
           context.fillStyle = 'rgba(10, 10, 10, 0.5)';
           var scale = thing.scale();
@@ -154,10 +163,12 @@ Combat.actions.register({
         context.save();
         context.lineWidth = 0.05;
         thing.drawBorder(context);
-        context.globalAlpha = 0.5;
-        context.translate(point.tile.x - thing.tile.x, point.tile.y - thing.tile.y);
-        thing.draw(context);
-        thing.drawBorder(context);
+        if (!this.points.offscreen) {
+          context.globalAlpha = 0.5;
+          context.translate(point.tile.x - thing.tile.x, point.tile.y - thing.tile.y);
+          thing.draw(context);
+          thing.drawBorder(context);
+        }
         context.restore();
       }
     }

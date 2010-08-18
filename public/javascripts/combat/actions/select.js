@@ -1,10 +1,24 @@
 Combat.actions.register({
-  trigger: { mouse: 'click' },
+  trigger: {
+    mouse: 'click',
+    control: 'select'
+  },
   title: 'select',
   begin: function(evt) { Combat.actions.active.click(evt); },
   end: function() {
     this.clear();
     Combat.draw();
+  },
+  bind: function(control) {
+    this.control = control;
+    var action = this;
+    control.find('button').click(function(evt) {
+      if (Combat.actions.active == action) {
+        var current = action.things.current;
+        if (current != null) { current.thing.destroy(); }
+        Combat.actions.stop(action);
+      }
+    });
   },
   clear: function() {
     this.index = null;

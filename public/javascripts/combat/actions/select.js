@@ -4,7 +4,10 @@ Combat.actions.register({
     control: 'select'
   },
   title: 'select',
-  begin: function(evt) { Combat.actions.active.click(evt); },
+  begin: function(evt) {
+    Combat.actions.active.click(evt);
+    Combat.actions.active.points.offscreen = false;
+  },
   end: function() {
     this.clear();
     Combat.draw();

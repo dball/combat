@@ -29,12 +29,18 @@ Combat.actions.register({
       }
     });
   },
+  mousewheel: function(evt, delta) {
+    var sizes = Combat.figures.sizes;
+    if (delta < 0) { this.size = sizes.larger(this.size); } else { this.size = sizes.smaller(this.size); }
+    Combat.draw();
+  },
   keypress: function(evt) {
     ch = String.fromCharCode(evt.charCode);
+    var sizes = Combat.figures.sizes;
     if (ch == ']') {
-      this.size = Combat.figures.sizes.larger(this.size);
+      this.size = sizes.larger(this.size);
     } else if (ch == '[') {
-      this.size = Combat.figures.sizes.smaller(this.size);
+      this.size = sizes.smaller(this.size);
     } else {
       this.letter = ch;
     }

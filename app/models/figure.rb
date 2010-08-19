@@ -13,7 +13,7 @@ class Figure < ActiveRecord::Base
     'C' => 6
   }
 
-  belongs_to :map
+  belongs_to :map, :inverse_of => :figures
   belongs_to :character
 
   validates_numericality_of :position_x
@@ -48,5 +48,14 @@ class Figure < ActiveRecord::Base
     else
       self.size = SIZE_CODES[index]
     end
+  end
+
+  def destroy
+    update_attribute(:deleted_at, Time.now)
+  end
+
+  def subscript
+    matches = map.figures.select {|f| f.letter == letter }
+    matches.length > 1 ?  matches.index(self).to_s : nil
   end
 end

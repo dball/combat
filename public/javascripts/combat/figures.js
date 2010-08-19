@@ -1,7 +1,7 @@
 Combat.figures = {
   init: function(json) {
     var that = this;
-    this.all = $.map(json, function(json) { return new that.build(json); });
+    this.all = $.map(json, function(json) { if (!json.deleted_at) { return new that.build(json); } });
     this.url = Combat.url + '/figures';
   },
 
@@ -37,7 +37,7 @@ Combat.figures = {
     this.type = 'figure';
     this.attrs = {};
     this.tile = null;
-    this.fields = ['size', 'letter', 'position_x', 'position_y'];
+    this.fields = ['size', 'letter', 'position_x', 'position_y', 'subscript'];
 
     this.load = function(json) {
       var that = this;
@@ -64,7 +64,15 @@ Combat.figures = {
     this.save = function() {
       if (this.attrs.id == null) {
         var that = this;
-        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { that.load(json, 'id'); } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) {
+          if (json.subscript == '1') {
+            $.each(Combat.figures.all, function(i, v) {
+              if (this.attrs.letter == that.attrs.letter) { this.attrs.subscript = '0'; }
+            });
+          }
+          that.load(json, 'id');
+          Combat.draw();
+        } });
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
@@ -121,7 +129,18 @@ Combat.figures = {
       var scale = this.scale();
       var font_size = scale * 0.7;
       var text_width = get_textWidth(this.attrs.letter, font_size);
-      context.strokeText(this.attrs.letter, (scale - text_width) / 2, 0, font_size);
+      if (!this.attrs.subscript) {
+        context.strokeText(this.attrs.letter, (scale - text_width) / 2, 0, font_size);
+      } else {
+        var sub_font_size = scale * 0.3;
+        var sub_text_width = get_textWidth(this.attrs.subscript, sub_font_size);
+        var offset = {
+          x: scale - sub_text_width * 1.25,
+          y: scale - sub_text_width * 1.5
+        };
+        context.strokeText(this.attrs.letter, (scale - text_width) / 2 - sub_text_width * 0.5, 0, font_size);
+        context.strokeText(this.attrs.subscript, offset.x, offset.y, sub_font_size);
+      }
       // iPad OS 3.0 doesn't support native canvas fillText, so we use the strokeText.js library instead
       /*
       // Firefox and Safari were both having issues with 1px fonts, so we scale by 10 as a workaround

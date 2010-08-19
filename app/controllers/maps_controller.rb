@@ -1,7 +1,7 @@
 class MapsController < ApplicationController
   def show
     @json = map.to_json(:include => {
-      :figures => { :include => :character },
+      :figures => { :include => :character, :methods => :subscript },
       :walls => { :include => :vertices },
       :images => { :methods => :url }
     })

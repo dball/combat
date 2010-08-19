@@ -6,7 +6,7 @@ Combat.actions.register({
   title: 'select',
   begin: function(evt) {
     Combat.actions.active.click(evt);
-    Combat.actions.active.points.offscreen = false;
+    if (Combat.actions.active) { Combat.actions.active.points.offscreen = false; }
   },
   end: function() {
     this.clear();

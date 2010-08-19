@@ -58,4 +58,6 @@ class Figure < ActiveRecord::Base
     matches = map.figures.select {|f| f.letter == letter }
     matches.length > 1 ?  matches.index(self).to_s : nil
   end
+
+  def subscript=(value); end
 end

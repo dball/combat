@@ -7,7 +7,10 @@ class Map < ActiveRecord::Base
   validates_presence_of :name
 
   before_validation do |map|
-    map.name = "Map #{new_record? ? (Map.count + 1) : id}" unless map.name.present?
+    logger.debug("Checking map name: #{map.name}")
+    unless map.name.present?
+      map.name = "Map #{new_record? ? (Map.count + 1) : id}"
+    end
   end
 
   def points

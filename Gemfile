@@ -1,14 +1,14 @@
 source 'http://rubygems.org'
 
-#gem "rails", :git => "git://github.com/rails/rails.git", :tag => 'v3.0.0.beta3'
-gem 'rails', :path => File.join(File.dirname(__FILE__), '/vendor/gems/rails')
+gem 'rails', :git => 'git://github.com/rails/rails.git', :tag => 'v3.0.0_RC'
 gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'pg'
-gem 'ruby-debug', :group => :development
-#gem 'capybara',         :git => 'git://github.com/jnicklas/capybara.git', :group => :test
-#gem 'database_cleaner', :git => 'git://github.com/bmabey/database_cleaner.git', :group => :test
-#gem 'cucumber-rails',   :git => 'git://github.com/aslakhellesoy/cucumber-rails.git', :group => :test
-#gem "rspec-rails", :git => 'git://github.com/rspec/rspec-rails.git', :group => :test
 gem 'aws-s3'
-#gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
-gem 'paperclip', :path => File.join(File.dirname(__FILE__), '/vendor/gems/paperclip')
+gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
+
+gem 'ruby-debug', :group => :development
+
+gem 'capybara',         :git => 'git://github.com/jnicklas/capybara.git', :group => :test
+gem 'database_cleaner', :git => 'git://github.com/bmabey/database_cleaner.git', :group => :test
+gem 'cucumber-rails',   :git => 'git://github.com/aslakhellesoy/cucumber-rails.git', :group => :test
+gem 'rspec-rails',      :git => 'git://github.com/rspec/rspec-rails.git', :group => :test

@@ -62,3 +62,20 @@ Combat.actions.register({
     Combat.actions.stop(this);
   }
 });
+Combat.actions.register({
+  trigger: { control: 'map name' },
+  bind: function(control) {
+    var input = control.find('input');
+    input.change(function(evt) {
+      $.ajax({ type: 'PUT', url: Combat.url, data: input.serialize(), success: function(json) { input.val(json.map.name); } });
+    });
+  }
+});
+Combat.actions.register({
+  trigger: { control: 'load map' },
+  bind: function(control) {
+    control.find('select').change(function(evt) {
+      window.location.href = $(this).val();
+    });
+  }
+});

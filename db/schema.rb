@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100818203110) do
+ActiveRecord::Schema.define(:version => 20100819040134) do
 
   create_table "characters", :force => true do |t|
     t.string "letter", :limit => 1,                  :null => false
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(:version => 20100818203110) do
   add_index "images", ["map_id"], :name => "index_images_on_map_id"
 
   create_table "maps", :force => true do |t|
+    t.string "name"
   end
 
   create_table "vertices", :force => true do |t|

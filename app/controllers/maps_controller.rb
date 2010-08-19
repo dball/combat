@@ -11,6 +11,14 @@ class MapsController < ApplicationController
     redirect_to map_path(Map.create)
   end
 
+  def update
+    if map.update_attributes(params[:map])
+      render :json => map.to_json
+    else
+      head :error
+    end
+  end
+
   def latest
     redirect_to map_path(Map.last || Map.create)
   end

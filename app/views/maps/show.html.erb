@@ -2,9 +2,16 @@
   <div id="sidebar">
     <ul id="controls">
       <li><%= button_to('New Map', maps_path) %></li>
-      <li data-control="create figure"><button>Figure</button> <input type="text" size="1" maxlength="1" value="X"></li>
-      <li data-control="draw wall"><button>Wall</button></li>
-      <li data-control="select"><button>Trash</button></li>
+      <li data-control="map name" title="Map name"><input type="text" size="10" name="map[name]" value="<%= @map.name %>"></li>
+      <li data-control="load map" title="Load map">
+        <select name="url">
+          <option></option>
+          <%= options_for_select(Map.all.reject {|map| map == @map }.map {|map| [map.name, map_path(map)] }) %>
+        </select>
+      </li>
+      <li data-control="create figure" title="Draw figures"><button>Figure</button> <input type="text" size="1" maxlength="1" value="X"></li>
+      <li data-control="draw wall" title="Draw walls"><button>Wall</button></li>
+      <li data-control="select" title="Delete objects"><button>Trash</button></li>
     </ul>
   </div>
   <div id="viewport">

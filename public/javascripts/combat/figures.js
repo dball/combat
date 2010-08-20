@@ -63,15 +63,19 @@ Combat.figures = {
 
     this.save = function() {
       if (this.attrs.id == null) {
+        console.log("saving", this);
         var that = this;
         $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) {
+          console.log("success", json);
           if (json.subscript == '1') {
             $.each(Combat.figures.all, function(i, v) {
               if (this.attrs.letter == that.attrs.letter) { this.attrs.subscript = '0'; }
             });
           }
           that.load(json, 'id');
+          console.log("loaded", that);
           Combat.draw();
+          console.log("drawn");
         } });
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });

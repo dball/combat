@@ -68,6 +68,7 @@ Combat.actions = {
     }
   },
   keypress: function(evt) {
+    if ($(evt.target).is(":input")) { return; }
     var action = Combat.actions.active;
     if (action != null) {
       evt.preventDefault();

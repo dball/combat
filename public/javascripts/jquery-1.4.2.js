@@ -5159,11 +5159,8 @@ jQuery.extend({
 			trigger("ajaxSend", [xhr, s]);
 		}
 
-    console.log("waiting for ajax", new Date().valueOf());
-
 		// Wait for a response to come back
 		var onreadystatechange = xhr.onreadystatechange = function( isTimeout ) {
-      console.log("onreadystatechange", xhr.readyState, new Date().valueOf());
 			// The request was aborted
 			if ( !xhr || xhr.readyState === 0 || isTimeout === "abort" ) {
 				// Opera doesn't call onreadystatechange before this point

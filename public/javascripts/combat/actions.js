@@ -68,10 +68,13 @@ Combat.actions = {
     }
   },
   keypress: function(evt) {
+    if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
+      Combat.actions.stop();
+      return;
+    }
     if ($(evt.target).is(":input")) { return; }
     var action = Combat.actions.active;
     if (action != null) {
-      evt.preventDefault();
       if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) { Combat.actions.stop(action); }
       else if (action.keypress) { action.keypress(evt); }
     } else {

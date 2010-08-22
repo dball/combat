@@ -107,6 +107,7 @@ Combat.actions.register({
     var current = this.things.current;
     if (current != null) {
       if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
+        evt.preventDefault();
         current.thing.destroy();
         Combat.actions.stop(this);
         return;

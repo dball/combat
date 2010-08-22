@@ -10,12 +10,23 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100819040134) do
+ActiveRecord::Schema.define(:version => 20100822035432) do
 
   create_table "characters", :force => true do |t|
     t.string "letter", :limit => 1,                  :null => false
     t.string "size",   :limit => 1, :default => "M"
   end
+
+  create_table "effects", :force => true do |t|
+    t.integer "map_id",                   :null => false
+    t.string  "shape",       :limit => 6, :null => false
+    t.integer "x",                        :null => false
+    t.integer "y",                        :null => false
+    t.integer "size",                     :null => false
+    t.float   "orientation"
+  end
+
+  add_index "effects", ["map_id"], :name => "index_effects_on_map_id"
 
   create_table "figures", :force => true do |t|
     t.integer  "map_id",                                     :null => false
@@ -47,8 +58,31 @@ ActiveRecord::Schema.define(:version => 20100819040134) do
   add_index "images", ["map_id"], :name => "index_images_on_map_id"
 
   create_table "maps", :force => true do |t|
-    t.string "name"
+    t.string   "name"
+    t.integer  "user_id"
+    t.datetime "loaded_at"
   end
+
+  add_index "maps", ["user_id", "loaded_at"], :name => "index_maps_on_user_id_and_loaded_at"
+
+  create_table "users", :force => true do |t|
+    t.string   "email",                               :default => "", :null => false
+    t.string   "encrypted_password",   :limit => 128, :default => "", :null => false
+    t.string   "password_salt",                       :default => "", :null => false
+    t.string   "reset_password_token"
+    t.string   "remember_token"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",                       :default => 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["email"], :name => "index_users_on_email", :unique => true
+  add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
 
   create_table "vertices", :force => true do |t|
     t.integer "wall_id", :null => false

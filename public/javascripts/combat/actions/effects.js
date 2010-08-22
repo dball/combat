@@ -1,14 +1,15 @@
 Combat.actions.register({
   trigger: {
-    key: 'c',
-    control: 'create figure'
+    key: 'e',
+    control: 'spell effect'
   },
-  title: 'create figure',
-  size: 'M',
+  title: 'spell effect',
+  shape: 'circle',
+  size: 4,
   begin: function(evt) {
     if (this.control) {
       this.control.addClass('active');
-      this.letter = this.control.find('input').val();
+      this.size = parseInt(this.control.find('input').val(), 10) / 5;
     }
     Combat.draw();
   },
@@ -16,7 +17,7 @@ Combat.actions.register({
     this.point = null;
     if (this.control) {
       this.control.removeClass('active');
-      this.control.find('input').val(this.letter);
+      this.control.find('input').val(this.size * 5);
     }
     Combat.draw();
   },
@@ -32,48 +33,43 @@ Combat.actions.register({
     });
   },
   mousewheel: function(evt, delta) {
-    var sizes = Combat.figures.sizes;
+    var sizes = Combat.effects.sizes;
     if (delta < 0) { this.size = sizes.larger(this.size); } else { this.size = sizes.smaller(this.size); }
+    if (this.control) {
+      this.control.find('input').val(this.size * 5);
+    }
     Combat.draw();
   },
   keypress: function(evt) {
     ch = String.fromCharCode(evt.charCode);
-    var sizes = Combat.figures.sizes;
+    var sizes = Combat.effects.sizes;
     if (ch == ']') {
       this.size = sizes.larger(this.size);
     } else if (ch == '[') {
       this.size = sizes.smaller(this.size);
-    } else {
-      this.letter = ch;
     }
     if (this.control) {
-      this.control.find('input').val(this.letter);
+      this.control.find('input').val(this.size * 5);
     }
     Combat.draw();
   },
   click: function(evt) {
     var tile = Combat.map.point(evt).tile;
-    var figure = new Combat.figures.create({
-      position_x: tile.x,
-      position_y: tile.y,
-      letter: this.letter,
-      size: this.size
-    });
+    var effect = new Combat.effects.create({ x: tile.x, y: tile.y, shape: this.shape, size: this.size });
     Combat.draw();
+    Combat.actions.stop();
   },
   mousemove: function(evt) {
-    if (this.letter) {
-      this.point = Combat.map.point(evt);
-      Combat.draw();
-    }
+    this.point = Combat.map.point(evt);
+    Combat.draw();
   },
   draw: function(context) {
-    if (!(this.letter && this.point)) { return; }
+    if (!this.point) { return; }
     var tile = this.point.tile;
-    var figure = new Combat.figures.build({ position_x: tile.x, position_y: tile.y, size: this.size, letter: this.letter });
+    var effect = new Combat.effects.build({ x: tile.x, y: tile.y, shape: this.shape, size: this.size });
     context.save();
     context.globalAlpha = 0.5;
-    figure.draw(context);
+    effect.draw(context);
     context.restore();
   }
 });

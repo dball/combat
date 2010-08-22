@@ -3,7 +3,8 @@ class MapsController < ApplicationController
     @json = map.to_json(:include => {
       :figures => { :include => :character, :methods => :subscript },
       :walls => { :include => :vertices },
-      :images => { :methods => :url }
+      :images => { :methods => :url },
+      :effects => {}
     })
   end
 

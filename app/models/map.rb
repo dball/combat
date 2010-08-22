@@ -3,6 +3,7 @@ class Map < ActiveRecord::Base
   has_many :figures, :dependent => :destroy, :inverse_of => :map
   has_many :walls, :dependent => :destroy
   has_many :images, :dependent => :destroy
+  has_many :effects, :dependent => :destroy, :inverse_of => :map
 
   validates_presence_of :name
 

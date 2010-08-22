@@ -12,6 +12,7 @@ Combat::Application.routes.draw do |map|
       end
     end
     resources :walls
+    resources :effects
     resources :images
   end
 end

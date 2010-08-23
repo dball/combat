@@ -6,7 +6,7 @@
       <li data-control="load map" title="Load map">
         <select name="url">
           <option></option>
-          <%= options_for_select(Map.all.reject {|map| map == @map }.map {|map| [map.name, map_path(map)] }) %>
+          <%= options_for_select(Map.all.map {|map| [map.name, map_path(map)] }) %>
         </select>
       </li>
       <li data-control="create figure" title="Draw figures"><button>Figure</button> <input type="text" size="1" maxlength="1" value="X"></li>

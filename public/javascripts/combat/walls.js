@@ -17,7 +17,7 @@ Combat.walls = {
   build: function(json) {
     this.type = 'wall';
     this.attrs = {};
-    this.fields = ['vertices'];
+    this.fields = ['vertices', 'kind'];
 
     this.load = function(json) {
       var that = this;
@@ -36,6 +36,7 @@ Combat.walls = {
 
     this.params = function() {
       var params = {};
+      params['wall[kind]'] = this.attrs.kind;
       params['wall[vertex_values]'] = $.map(this.attrs.vertices, function(vertex) { return { x: vertex.x, y: vertex.y }; });
       return params;
     }
@@ -80,14 +81,26 @@ Combat.walls = {
       if (!this.attrs.vertices || this.attrs.vertices.length <= 1) { return; }
       context.save();
       context.lineWidth = lineWidth
-      var v = this.attrs.vertices[0];
-      context.beginPath();
-      context.moveTo(v.x, v.y);
-      for (var i=1, l=this.attrs.vertices.length; i < l; i++) {
-        v = this.attrs.vertices[i];
-        context.lineTo(v.x, v.y);
+      if (this.attrs.kind == 'drawing') {
+        context.lineJoin = 'round';
+        for (var i=0, l=this.attrs.vertices.length; i < l-1; i++) {
+          var v0 = this.attrs.vertices[i];
+          var v1 = this.attrs.vertices[i+1];
+          context.beginPath();
+          context.moveTo(v0.x, v0.y);
+          context.lineTo(v1.x, v1.y);
+          context.stroke();
+        }
+      } else if (this.attrs.kind == 'wall') {
+        var v = this.attrs.vertices[0];
+        context.beginPath();
+        context.moveTo(v.x, v.y);
+        for (var i=1, l=this.attrs.vertices.length; i < l; i++) {
+          v = this.attrs.vertices[i];
+          context.lineTo(v.x, v.y);
+        }
+        context.stroke();
       }
-      context.stroke();
       context.restore();
     }
 

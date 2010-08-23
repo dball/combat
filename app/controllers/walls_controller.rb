@@ -2,7 +2,7 @@ class WallsController < ApplicationController
   def create
     map = Map.find(params[:map_id])
     if wall = map.walls.create(params[:wall])
-      render :json => { :id => wall.id }, :status => :created
+      render :json => { :id => wall.id }
     else
       head :error
     end

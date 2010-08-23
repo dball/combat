@@ -29,41 +29,37 @@ ActiveRecord::Schema.define(:version => 20100823021244) do
   add_index "effects", ["map_id"], :name => "index_effects_on_map_id"
 
   create_table "figures", :force => true do |t|
-    t.integer  "map_id",                                     :null => false
-    t.integer  "position_x"
-    t.integer  "position_y"
-    t.string   "letter",       :limit => 1,                  :null => false
-    t.string   "size",         :limit => 1, :default => "M", :null => false
-    t.integer  "character_id"
-    t.datetime "deleted_at"
+    t.integer   "map_id",                                     :null => false
+    t.integer   "position_x"
+    t.integer   "position_y"
+    t.string    "letter",       :limit => 1,                  :null => false
+    t.string    "size",         :limit => 1, :default => "M", :null => false
+    t.integer   "character_id"
+    t.timestamp "deleted_at"
   end
 
   add_index "figures", ["character_id"], :name => "index_figures_on_character_id"
   add_index "figures", ["map_id"], :name => "index_figures_on_map_id"
 
   create_table "images", :force => true do |t|
-    t.integer  "map_id",                              :null => false
-    t.float    "x"
-    t.float    "y"
-    t.float    "width",              :default => 1.0, :null => false
-    t.float    "height",             :default => 1.0, :null => false
-    t.string   "image_file_name"
-    t.string   "image_content_type"
-    t.integer  "image_file_size"
-    t.datetime "image_updated_at"
-    t.integer  "image_width",        :default => 0,   :null => false
-    t.integer  "image_height",       :default => 0,   :null => false
+    t.integer   "map_id",                              :null => false
+    t.float     "x"
+    t.float     "y"
+    t.float     "width",              :default => 1.0, :null => false
+    t.float     "height",             :default => 1.0, :null => false
+    t.string    "image_file_name"
+    t.string    "image_content_type"
+    t.integer   "image_file_size"
+    t.timestamp "image_updated_at"
+    t.integer   "image_width",        :default => 0,   :null => false
+    t.integer   "image_height",       :default => 0,   :null => false
   end
 
   add_index "images", ["map_id"], :name => "index_images_on_map_id"
 
   create_table "maps", :force => true do |t|
-    t.string   "name"
-    t.integer  "user_id"
-    t.datetime "loaded_at"
+    t.string "name"
   end
-
-  add_index "maps", ["user_id", "loaded_at"], :name => "index_maps_on_user_id_and_loaded_at"
 
   create_table "users", :force => true do |t|
     t.string   "email",                               :default => "", :null => false
@@ -93,8 +89,8 @@ ActiveRecord::Schema.define(:version => 20100823021244) do
   add_index "vertices", ["wall_id"], :name => "index_vertices_on_wall_id"
 
   create_table "walls", :force => true do |t|
-    t.integer "map_id",              :null => false
-    t.string  "kind",   :limit => 7
+    t.integer "map_id",                                  :null => false
+    t.string  "kind",   :limit => 7, :default => "wall", :null => false
   end
 
   add_index "walls", ["map_id"], :name => "index_walls_on_map_id"

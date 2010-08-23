@@ -14,6 +14,6 @@ class Map < ActiveRecord::Base
   end
 
   def points
-    [figures, walls, images].map {|c| c.map {|o| o.points }.flatten }.flatten
+    [figures.reject {|f| f.deleted_at }, walls, images].map {|c| c.map {|o| o.points }.flatten }.flatten
   end
 end

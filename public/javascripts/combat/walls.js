@@ -45,7 +45,7 @@ Combat.walls = {
       if (this.attrs.id == null) {
         var that = this;
         console.log("saving new wall", this, this.params());
-        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { console.log("saved new wall", json, this); that.load(json, 'id') } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { console.log("saved new wall", json); that.load(json, 'id'); } });
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }

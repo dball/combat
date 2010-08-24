@@ -16,6 +16,7 @@ Combat.actions.register({
   },
   end: function(evt) {
     if (this.control) { this.control.removeClass('active'); this.control.find('select').attr('disabled', false); }
+    console.log("ending wall", this.vertices);
     if (this.vertices.length > 1) { Combat.walls.create({ vertices: this.vertices, kind: this.kind }); }
     this.point = null;
     this.kind = null;

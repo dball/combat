@@ -5251,6 +5251,7 @@ jQuery.extend({
 		try {
 			xhr.send( type === "POST" || type === "PUT" || type === "DELETE" ? s.data : null );
 		} catch(e) {
+      console.log("Error sending xhr", e, s);
 			jQuery.handleError(s, xhr, null, e);
 			// Fire the complete handlers
 			complete();

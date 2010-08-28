@@ -55,6 +55,7 @@ class Figure < ActiveRecord::Base
   end
 
   def subscript
+    return nil unless ('a'..'z').include?(letter)
     matches = map.figures.select {|f| f.letter == letter }
     matches.length > 1 ?  matches.index(self).to_s : nil
   end

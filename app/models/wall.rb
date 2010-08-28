@@ -13,6 +13,7 @@ class Wall < ActiveRecord::Base
   end
 
   def points
+    return [] if vertices.empty?
     [Vertex.new(:x => vertices.map {|v| v.x }.min - 1, :y => vertices.map {|v| v.y }.min - 1),
       Vertex.new(:x => vertices.map {|v| v.x}.max + 1, :y => vertices.map {|v| v.y }.max + 1)]
   end

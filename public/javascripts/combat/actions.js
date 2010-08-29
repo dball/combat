@@ -56,7 +56,7 @@ Combat.actions = {
   },
   mouseup: function(evt) {
     var action = Combat.actions.active;
-    if (action && action.mouseup) { action.mouseup(evt); Combat.actions.flags.swallowClick = true; }
+    if (action && action.mouseup) { action.mouseup(evt); /* Combat.actions.flags.swallowClick = true; */ }
   },
   mouseenter: function(evt) {
     var action = Combat.actions.active;

@@ -1,6 +1,8 @@
 class Figure < ActiveRecord::Base
-  SIZES = %w(fine diminuitive tiny small medium large huge gargantuan colossal)
-  SIZE_CODES = SIZES.map {|s| s[0, 1].upcase }
+  KINDS = %w(actor set prop).freeze
+  DEFAULT_COLOR = Color.new(:red => 0, :green => 0, :blue => 0, :alpha => 1).freeze
+  SIZES = %w(fine diminuitive tiny small medium large huge gargantuan colossal).freeze
+  SIZE_CODES = SIZES.map {|s| s[0, 1].upcase }.freeze
   SCALES = {
     'F' => 1,
     'D' => 1,
@@ -11,14 +13,16 @@ class Figure < ActiveRecord::Base
     'H' => 3,
     'G' => 4,
     'C' => 6
-  }
+  }.freeze
 
   belongs_to :map, :inverse_of => :figures
   belongs_to :character
+  belongs_to :specific_color, :inverse_of => :figures, :class_name => 'Color', :foreign_key => :color_id
 
   validates_numericality_of :position_x
   validates_numericality_of :position_y
   validates_inclusion_of :size, :in => SIZE_CODES
+  validates_inclusion_of :kind, :in => KINDS
 
   def x
     position_x
@@ -61,4 +65,19 @@ class Figure < ActiveRecord::Base
   end
 
   def subscript=(value); end
+
+  def color
+    map.color(self)
+  end
+
+  def color=(color)
+    self.specific_color = color
+  end
+
+  def color_json
+    color.to_json
+  end
+
+  def color_json=(json)
+  end
 end

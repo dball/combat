@@ -37,7 +37,7 @@ Combat.figures = {
     this.type = 'figure';
     this.attrs = {};
     this.tile = null;
-    this.fields = ['size', 'letter', 'position_x', 'position_y', 'subscript', 'color_json'];
+    this.fields = ['size', 'letter', 'position_x', 'position_y', 'subscript', 'color_json', 'bgcolor_json'];
 
     this.load = function(json) {
       var that = this;
@@ -117,10 +117,14 @@ Combat.figures = {
     this.draw = function(context) {
       context.save();
       var scale = this.scale();
-      context.fillStyle = 'rgba(100, 100, 100, 0.3)';
-      context.translate(this.tile.x, this.tile.y);
-      context.fillRect(0, 0, scale, scale);
+      context.fillStyle = this.attrs.bgcolor_json;
       context.strokeStyle = this.attrs.color_json;
+      //context.fillStyle = 'rgba(100, 100, 100, 0.3)';
+      context.translate(this.tile.x, this.tile.y);
+      context.save();
+      context.globalAlpha = 0.3;
+      context.fillRect(0, 0, scale, scale);
+      context.restore();
       this.drawLetter(context);
       context.restore();
     }

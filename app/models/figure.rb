@@ -1,6 +1,6 @@
 class Figure < ActiveRecord::Base
   KINDS = %w(actor set prop).freeze
-  DEFAULT_COLOR = Color.new(:red => 0, :green => 0, :blue => 0, :alpha => 1).freeze
+  DEFAULT_COLOR = Palette::Color.new(:red => 0, :green => 0, :blue => 0, :alpha => 1).freeze
   SIZES = %w(fine diminuitive tiny small medium large huge gargantuan colossal).freeze
   SIZE_CODES = SIZES.map {|s| s[0, 1].upcase }.freeze
   SCALES = {
@@ -17,7 +17,7 @@ class Figure < ActiveRecord::Base
 
   belongs_to :map, :inverse_of => :figures
   belongs_to :character
-  belongs_to :specific_color, :inverse_of => :figures, :class_name => 'Color', :foreign_key => :color_id
+  belongs_to :specific_color, :inverse_of => :figures, :class_name => 'Palette::Color', :foreign_key => :color_id
 
   validates_numericality_of :position_x
   validates_numericality_of :position_y
@@ -75,9 +75,16 @@ class Figure < ActiveRecord::Base
   end
 
   def color_json
-    color.to_json
+    color.to_rgb.html
   end
 
-  def color_json=(json)
+  def color_json=(json); end
+
+  def bgcolor_json
+    hsl = color.to_rgb.to_hsl
+    hsl.l = 0.6
+    hsl.html
   end
+
+  def bgcolor_json=(json); end
 end

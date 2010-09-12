@@ -9,6 +9,9 @@ Combat.actions.register({
     if (this.control) {
       this.control.addClass('active');
       this.letter = this.control.find('input').val();
+      this.kind = this.control.find('select').val();
+    } else {
+      this.kind = 'actor';
     }
     Combat.draw();
   },
@@ -30,6 +33,10 @@ Combat.actions.register({
         Combat.actions.stop(action);
       }
     });
+    control.find('input').change(function(evt) {
+      action.letter = $(this).val();
+      action.setKind();
+    });
   },
   mousewheel: function(evt, delta) {
     var sizes = Combat.figures.sizes;
@@ -41,14 +48,18 @@ Combat.actions.register({
     var sizes = Combat.figures.sizes;
     if (ch == ']') {
       this.size = sizes.larger(this.size);
+      Combat.draw();
+      return;
     } else if (ch == '[') {
       this.size = sizes.smaller(this.size);
-    } else {
-      this.letter = ch;
+      Combat.draw();
+      return;
     }
+    this.letter = ch;
     if (this.control) {
       this.control.find('input').val(this.letter);
     }
+    this.setKind();
     Combat.draw();
   },
   click: function(evt) {
@@ -57,7 +68,8 @@ Combat.actions.register({
       position_x: tile.x,
       position_y: tile.y,
       letter: this.letter,
-      size: this.size
+      size: this.size,
+      kind: this.control.find('select').val()
     });
     Combat.draw();
   },
@@ -65,6 +77,20 @@ Combat.actions.register({
     if (this.letter) {
       this.point = Combat.map.point(evt);
       Combat.draw();
+    }
+  },
+  setKind: function(letter) {
+    if (this.letter.match(/[A-Z]/)) {
+      this.kind = 'actor';
+    } else if (this.letter.match(/[a-z]/)) {
+      this.kind = 'extra';
+    } else if (this.letter.match(/\s/)) {
+      this.kind = 'set';
+    } else {
+      this.kind = 'prop';
+    }
+    if (this.control) {
+      this.control.find('select').val(this.kind);
     }
   },
   draw: function(context) {

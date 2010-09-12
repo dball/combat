@@ -3,7 +3,7 @@ class Palette < ActiveRecord::Base
   has_many :colors, :inverse_of => :palette, :dependent => :destroy, :order => 'colors.id'
 
   def color(figure)
-    figure.specific_color || colors.detect {|color| figure.kind == color.kind } || Figure::DEFAULT_COLOR
+    figure.specific_color || colors.detect {|color| figure.kind == color.kind } || Figure::KINDS[figure.kind] || Figure::DEFAULT_COLOR
   end
 
   class Color < ActiveRecord::Base
@@ -14,7 +14,7 @@ class Palette < ActiveRecord::Base
   
     validates_numericality_of :red, :green, :blue, :greater_than_or_equal_to => 0, :less_than => 256
     validates_numericality_of :alpha, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 1
-    validates_inclusion_of :kind, :in => Figure::KINDS, :allow_blank => true
+    # validates_inclusion_of :kind, :in => Figure.kinds, :allow_blank => true
 
     def to_rgb
       ::Color::RGB.new(red, green, blue)

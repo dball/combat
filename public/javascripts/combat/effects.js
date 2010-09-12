@@ -86,6 +86,20 @@ Combat.effects = {
       if (this.attrs.shape == 'circle') {
         context.beginPath();
         context.arc(this.tile.x, this.tile.y, this.attrs.size, 0, Math.PI * 2, true);
+
+        var hatch = this.attrs.size / 4;
+        //context.closePath();
+        //context.stroke();
+
+        //context.beginPath();
+        context.moveTo(this.tile.x, this.tile.y - hatch);
+        context.lineTo(this.tile.x, this.tile.y + hatch);
+        //context.closePath();
+        //context.stroke();
+
+        //context.beginPath();
+        context.moveTo(this.tile.x - hatch, this.attrs.y);
+        context.lineTo(this.tile.x + hatch, this.attrs.y);
         context.closePath();
         context.stroke();
       } else {

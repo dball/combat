@@ -1,13 +1,14 @@
 class Figure < ActiveRecord::Base
-  KINDS = ActiveSupport::OrderedHash.new.tap do |hash|
-    [
-      ['actor', 0, 255, 0],
-      ['extra', 255, 0, 0],
-      ['prop', 0, 0, 0],
-      ['set', 0, 0, 255]
-    ].each {|name, red, blue, green| hash[name] = Palette::Color.new(:red => red, :blue => blue, :green => green, :alpha => 1) }
-  end.freeze
-  DEFAULT_COLOR = Palette::Color.new(:red => 0, :green => 0, :blue => 0, :alpha => 1).freeze
+  KINDS = %w(actor extra prop set).freeze
+  #ActiveSupport::OrderedHash.new.tap do |hash|
+  #  [
+  #    ['actor', 0, 255, 0],
+  #    ['extra', 255, 0, 0],
+  #    ['prop', 0, 0, 0],
+  #    ['set', 0, 0, 255]
+  #  ].each {|name, red, blue, green| hash[name] = Palette::Color.new(:red => red, :blue => blue, :green => green, :alpha => 1) }
+  #end.freeze
+  #DEFAULT_COLOR = Palette::Color.new(:red => 0, :green => 0, :blue => 0, :alpha => 1).freeze
   SIZES = %w(fine diminuitive tiny small medium large huge gargantuan colossal).freeze
   SIZE_CODES = SIZES.map {|s| s[0, 1].upcase }.freeze
   SCALES = {
@@ -32,7 +33,7 @@ class Figure < ActiveRecord::Base
   validates_inclusion_of :kind, :in => KINDS
 
   def self.kinds
-    KINDS.keys
+    KINDS
   end
 
   def x

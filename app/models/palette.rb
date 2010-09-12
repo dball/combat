@@ -3,7 +3,8 @@ class Palette < ActiveRecord::Base
   has_many :colors, :inverse_of => :palette, :dependent => :destroy, :order => 'colors.id'
 
   def color(figure)
-    figure.specific_color || colors.detect {|color| figure.kind == color.kind } || Figure::KINDS[figure.kind] || Figure::DEFAULT_COLOR
+    figure.specific_color || colors.detect {|color| figure.kind == color.kind }
+    #|| Figure::KINDS[figure.kind] || Figure::DEFAULT_COLOR
   end
 
   class Color < ActiveRecord::Base

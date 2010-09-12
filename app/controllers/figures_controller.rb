@@ -2,7 +2,7 @@ class FiguresController < ApplicationController
   def create
     map = Map.find(params[:map_id])
     if figure = map.figures.create(params[:figure])
-      render :json => { :id => figure.id, :subscript => figure.subscript }
+      render :json => { :id => figure.id, :subscript => figure.subscript, :color_json => figure.color_json, :bgcolor_json => figure.bgcolor_json }
     else
       head :error
     end

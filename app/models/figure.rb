@@ -1,10 +1,10 @@
 class Figure < ActiveRecord::Base
   KINDS = ActiveSupport::OrderedHash.new.tap do |hash|
     [
-      ['actor', 0, 0, 255],
+      ['actor', 0, 255, 0],
       ['extra', 255, 0, 0],
       ['prop', 0, 0, 0],
-      ['set', 0, 255, 0]
+      ['set', 0, 0, 255]
     ].each {|name, red, blue, green| hash[name] = Palette::Color.new(:red => red, :blue => blue, :green => green, :alpha => 1) }
   end.freeze
   DEFAULT_COLOR = Palette::Color.new(:red => 0, :green => 0, :blue => 0, :alpha => 1).freeze

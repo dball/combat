@@ -75,21 +75,26 @@ Combat.actions = {
     }
   },
   keypress: function(evt) {
+    if ($(evt.target).is(":input")) { return; }
+    var action = Combat.actions.active;
+    if (action != null) {
+      if (action.keypress) {
+        evt.preventDefault();
+        action.keypress(evt);
+      }
+    } else {
+      var key = evt.charCode != 0 ? String.fromCharCode(evt.charCode) : evt.keyCode
+      if (action = Combat.actions.triggers.keys[key]) {
+        evt.preventDefault();
+        Combat.actions.start(action, evt);
+      }
+    }
+  },
+  keyup: function(evt) {
     if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
       evt.preventDefault();
       Combat.actions.stop();
       return;
-    }
-    if ($(evt.target).is(":input")) { return; }
-    var action = Combat.actions.active;
-    if (action != null) {
-      if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) { Combat.actions.stop(action); }
-      else if (action.keypress) { action.keypress(evt); }
-    } else {
-      var key = evt.charCode != 0 ? String.fromCharCode(evt.charCode) : evt.keyCode
-      if (action = Combat.actions.triggers.keys[key]) {
-        evt.preventDefault(); Combat.actions.start(action, evt);
-      }
     }
   },
   gesturechange: function(evt) {
@@ -107,6 +112,7 @@ Combat.actions = {
     canvas.mouseenter(this.mouseenter);
     canvas.mouseleave(this.mouseleave);
     $(document).keypress(this.keypress);
+    $(document).keyup(this.keyup);
     $.each(this.triggers.controls, function() { this.bind(controls.find("*[data-control='" + this.trigger.control + "']")); });
     $(window).resize(function() {
       Combat.map.resize(true);

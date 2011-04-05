@@ -76,6 +76,7 @@ Combat.actions = {
   },
   keypress: function(evt) {
     if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
+      evt.preventDefault();
       Combat.actions.stop();
       return;
     }

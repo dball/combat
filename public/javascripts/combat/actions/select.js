@@ -127,7 +127,6 @@ Combat.actions.register({
       }
     }
     Combat.actions.stop(this);
-    keypress(evt);
   },
   draw: function(context) {
     var current = this.things.current;

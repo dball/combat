@@ -76,10 +76,6 @@ Combat.actions = {
   },
   keypress: function(evt) {
     if ($(evt.target).is(":input")) { return; }
-    if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-      evt.preventDefault();
-      return;
-    }
     var action = Combat.actions.active;
     if (action != null) {
       if (action.keypress) {
@@ -92,6 +88,9 @@ Combat.actions = {
         evt.preventDefault();
         Combat.actions.start(action, evt);
       }
+    }
+    if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
+      evt.preventDefault();
     }
   },
   keyup: function(evt) {

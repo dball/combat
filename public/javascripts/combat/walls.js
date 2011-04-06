@@ -35,8 +35,10 @@ Combat.walls = {
     }
 
     this.copy = function() {
-      var copy = $.extend({}, this);
-      copy.attrs.id = null;
+      var attrs = $.extend(true, {}, this.attrs);
+      delete attrs.id;
+      var copy = new Combat.walls.build(attrs);
+      Combat.walls.all.push(copy);
       return copy;
     }
 

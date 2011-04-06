@@ -126,10 +126,10 @@ Combat.actions.register({
           case ' ':
             if (current.thing.copy) {
               var copy = current.thing.copy();
-              console.log("copy", copy);
-              copy.move(this.points.current);
-              copy.save();
+              copy.move(this.points.current.minus(this.things.current.offset));
+              Combat.draw();
             }
+            return;
         }
       }
     }

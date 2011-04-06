@@ -34,6 +34,12 @@ Combat.walls = {
       return parts.concat(args).join('/');
     }
 
+    this.copy = function() {
+      var copy = $.extend({}, this);
+      copy.attrs.id = null;
+      return copy;
+    }
+
     this.params = function() {
       var params = {};
       params['wall[kind]'] = this.attrs.kind;

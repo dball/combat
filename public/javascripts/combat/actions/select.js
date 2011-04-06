@@ -123,11 +123,17 @@ Combat.actions.register({
             current.thing.reduce();
             Combat.draw();
             return;
+          case ' ':
+            if (current.thing.copy) {
+              var copy = current.thing.copy();
+              console.log("copy", copy);
+              copy.move(this.points.current);
+              copy.save();
+            }
         }
       }
     }
     Combat.actions.stop(this);
-    keypress(evt);
   },
   draw: function(context) {
     var current = this.things.current;

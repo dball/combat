@@ -55,17 +55,17 @@ ActiveRecord::Schema.define(:version => 20100830020228) do
   add_index "figures", ["map_id"], :name => "index_figures_on_map_id"
 
   create_table "images", :force => true do |t|
-    t.integer   "map_id",                              :null => false
-    t.float     "x"
-    t.float     "y"
-    t.float     "width",              :default => 1.0, :null => false
-    t.float     "height",             :default => 1.0, :null => false
-    t.string    "image_file_name"
-    t.string    "image_content_type"
-    t.integer   "image_file_size"
-    t.timestamp "image_updated_at"
-    t.integer   "image_width",        :default => 0,   :null => false
-    t.integer   "image_height",       :default => 0,   :null => false
+    t.integer  "map_id",                              :null => false
+    t.float    "x"
+    t.float    "y"
+    t.float    "width",              :default => 1.0, :null => false
+    t.float    "height",             :default => 1.0, :null => false
+    t.string   "image_file_name"
+    t.string   "image_content_type"
+    t.integer  "image_file_size"
+    t.datetime "image_updated_at"
+    t.integer  "image_width",        :default => 0,   :null => false
+    t.integer  "image_height",       :default => 0,   :null => false
   end
 
   add_index "images", ["map_id"], :name => "index_images_on_map_id"

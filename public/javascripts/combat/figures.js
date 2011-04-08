@@ -1,7 +1,6 @@
 Combat.figures = {
   init: function(json) {
-    var that = this;
-    this.all = $.map(json, function(json) { if (!json.deleted_at) { return new that.build(json); } });
+    this.all = _.map(json, function(json) { if (!json.deleted_at) { return new this.build(json); } }, this);
     this.url = Combat.url + '/figures';
   },
 
@@ -24,7 +23,7 @@ Combat.figures = {
     }
   },
 
-  draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
+  draw: function(context) { _.each(this.all, function(figure) { figure.draw(context); }); },
 
   create: function(attrs) {
     var figure = new Combat.figures.build(attrs);
@@ -40,11 +39,16 @@ Combat.figures = {
     this.fields = ['size', 'letter', 'position_x', 'position_y', 'subscript', 'color_json', 'bgcolor_json', 'kind'];
 
     this.load = function(json) {
-      var that = this;
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
-      this.tile = Combat.map.points.create({ x: this.attrs.position_x, y: this.attrs.position_y }).tile;
+      _.each(fields, function(field) {
+        if (!(json[field] === undefined)) {
+          this.attrs[field] = json[field];
+        }
+      }, this);
+      this.tile = Combat.map.points.create(
+        { x: this.attrs.position_x, y: this.attrs.position_y }
+      ).tile;
     }
 
     this.url = function() {
@@ -56,23 +60,27 @@ Combat.figures = {
 
     this.params = function() {
       var params = {};
-      var that = this;
-      $.each(this.fields, function(i, field) { params['figure[' + field + ']'] = that.attrs[field]; });
+      _.each(this.fields, function(field) {
+        params['figure[' + field + ']'] = this.attrs[field];
+      }, this);
       return params;
     }
 
     this.save = function() {
       if (this.attrs.id == null) {
         var that = this;
-        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) {
-          if (json.subscript == '1') {
-            $.each(Combat.figures.all, function(i, v) {
-              if (this.attrs.letter == that.attrs.letter) { this.attrs.subscript = '0'; }
-            });
-          }
-          that.load(json, 'id');
-          Combat.draw();
-        } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params() })
+          .success(function(json) {
+            if (json.subscript == '1') {
+              _.each(Combat.figures.all, function(figure) {
+                if (figure.attrs.letter == this.attrs.letter) {
+                  figure.attrs.subscript = '0';
+                }
+              });
+            }
+            this.load(json, 'id');
+            Combat.draw();
+          });
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }

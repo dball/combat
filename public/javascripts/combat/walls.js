@@ -1,11 +1,10 @@
 Combat.walls = {
   init: function(json) {
-    var that = this;
-    this.all = $.map(json, function(json) { return new that.build(json); });
+    this.all = _.map(json, function(json) { return new this.build(json); }, this);
     this.url = Combat.url + '/walls';
   },
 
-  draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
+  draw: function(context) { _.each(this.all, function(object) { object.draw(context); }); },
 
   create: function(attrs) {
     var wall = new Combat.walls.build(attrs);
@@ -20,10 +19,9 @@ Combat.walls = {
     this.fields = ['vertices', 'kind'];
 
     this.load = function(json) {
-      var that = this;
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
+      _.each(fields, function(field) { if (!(json[field] === undefined)) { this.attrs[field] = json[field]; } }, this);
       if (this.attrs.vertices) { this.tile = this.attrs.vertices[0]; }
     }
 
@@ -51,8 +49,8 @@ Combat.walls = {
 
     this.save = function() {
       if (this.attrs.id == null) {
-        var that = this;
-        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { that.load(json, 'id'); } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params() })
+          .success(_.bind(function(json) { this.load(json, 'id'); }, this));
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
@@ -68,7 +66,7 @@ Combat.walls = {
 
     this.move = function(point) {
       var offset = { x: point.tile.x - this.tile.x, y: point.tile.y - this.tile.y };
-      $.each(this.attrs.vertices, function() { this.x += offset.x; this.y += offset.y; });
+      _.each(this.attrs.vertices, function(vertex) { vertex.x += offset.x; vertex.y += offset.y; });
       this.save();
     }
 
@@ -91,22 +89,19 @@ Combat.walls = {
       context.lineWidth = lineWidth
       if (this.attrs.kind == 'drawing') {
         context.lineJoin = 'round';
-        for (var i=0, l=this.attrs.vertices.length; i < l-1; i++) {
-          var v0 = this.attrs.vertices[i];
-          var v1 = this.attrs.vertices[i+1];
+        var v0 = _.first(this.attrs.vertices);
+        _.each(_.rest(this.attrs.vertices), function(v1) {
           context.beginPath();
           context.moveTo(v0.x, v0.y);
           context.lineTo(v1.x, v1.y);
           context.stroke();
-        }
+          v0 = v1;
+        });
       } else if (this.attrs.kind == 'wall') {
-        var v = this.attrs.vertices[0];
+        var v = _.first(this.attrs.vertices);
         context.beginPath();
         context.moveTo(v.x, v.y);
-        for (var i=1, l=this.attrs.vertices.length; i < l; i++) {
-          v = this.attrs.vertices[i];
-          context.lineTo(v.x, v.y);
-        }
+        _.each(_.rest(this.attrs.vertices), function(v) { context.lineTo(v.x, v.y); });
         context.stroke();
       }
       context.restore();

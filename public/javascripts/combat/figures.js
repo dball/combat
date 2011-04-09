@@ -1,6 +1,6 @@
 Combat.figures = {
   init: function(json) {
-    this.all = _.map(json, function(json) { if (!json.deleted_at) { return new this.build(json); } }, this);
+    this.all = _(json).map(function(json) { if (!json.deleted_at) { return new this.build(json); } }, this);
     this.url = Combat.url + '/figures';
   },
 
@@ -23,7 +23,7 @@ Combat.figures = {
     }
   },
 
-  draw: function(context) { _.each(this.all, function(figure) { figure.draw(context); }); },
+  draw: function(context) { _(this.all).each(function(figure) { figure.draw(context); }); },
 
   create: function(attrs) {
     var figure = new Combat.figures.build(attrs);
@@ -41,7 +41,7 @@ Combat.figures = {
     this.load = function(json) {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      _.each(fields, function(field) {
+      _(fields).each(function(field) {
         if (!(json[field] === undefined)) {
           this.attrs[field] = json[field];
         }
@@ -60,7 +60,7 @@ Combat.figures = {
 
     this.params = function() {
       var params = {};
-      _.each(this.fields, function(field) {
+      _(this.fields).each(function(field) {
         params['figure[' + field + ']'] = this.attrs[field];
       }, this);
       return params;
@@ -68,19 +68,18 @@ Combat.figures = {
 
     this.save = function() {
       if (this.attrs.id == null) {
-        var that = this;
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
-          .success(function(json) {
+          .success(_.bind(function(json) {
             if (json.subscript == '1') {
-              _.each(Combat.figures.all, function(figure) {
+              _(Combat.figures.all).each(function(figure) {
                 if (figure.attrs.letter == this.attrs.letter) {
                   figure.attrs.subscript = '0';
                 }
-              });
+              }, this);
             }
             this.load(json, 'id');
             Combat.draw();
-          });
+          }, this));
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
@@ -95,13 +94,13 @@ Combat.figures = {
     }
 
     this.enlarge = function() {
-      var that = this;
-      $.ajax({ type: 'POST', url: this.url('enlarge'), success: function(results) { that.load(results); Combat.draw(); } });
+      $.ajax({ type: 'POST', url: this.url('enlarge') })
+        .success(_.bind(function(results) { this.load(results); Combat.draw(); }, this));
     }
 
     this.reduce = function() {
-      var that = this;
-      $.ajax({ type: 'POST', url: this.url('reduce'), success: function(results) { that.load(results); Combat.draw(); } });
+      $.ajax({ type: 'POST', url: this.url('reduce') })
+        .success(_.bind(function(results) { this.load(results); Combat.draw(); }, this));
     }
 
     this.scale = function() {

@@ -1,7 +1,6 @@
 Combat.effects = {
   init: function(json) {
-    var that = this;
-    this.all = $.map(json, function(json) { return new that.build(json); });
+    this.all = _(json).map(function(json) { return new this.build(json); }, this);
     this.url = Combat.url + '/effects';
   },
 
@@ -19,7 +18,7 @@ Combat.effects = {
     }
   },
 
-  draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
+  draw: function(context) { _(this.all).each(function(effect) { effect.draw(context); }); },
 
   create: function(attrs) {
     var effect = new Combat.effects.build(attrs);
@@ -37,7 +36,7 @@ Combat.effects = {
       var that = this;
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
+      _(fields).each(function(field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } }, this);
       this.tile = Combat.map.points.create({ x: this.attrs.x, y: this.attrs.y }).tile;
     }
 
@@ -50,15 +49,14 @@ Combat.effects = {
 
     this.params = function() {
       var params = {};
-      var that = this;
-      $.each(this.fields, function(i, field) { params['effect[' + field + ']'] = that.attrs[field]; });
+      _(this.fields).each(function(field) { params['effect[' + field + ']'] = this.attrs[field]; }, this);
       return params;
     }
 
     this.save = function() {
       if (this.attrs.id == null) {
-        var that = this;
-        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { that.load(json, 'id') } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params() })
+          .success(_.bind(function(json) { this.load(json, 'id'); }, this));
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }

@@ -9,12 +9,9 @@ Combat.map = {
   resize: function(reset) {
     this.canvas.width = $('#viewport').width();
     this.canvas.height = window.innerHeight;
-    if (reset) {
-      if (this.reset_timeout) { clearTimeout(this.reset_timeout); }
-      var that = this;
-      this.reset_timeout = setTimeout(function() { that.viewport.reset(); that.reset_timeout = null; }, 100);
-    }
+    if (reset) { _.delay(this.throttledReset, 500); }
   },
+  throttledReset: _.throttle(function() { Combat.map.viewport.reset(); }, 500),
   tiles: {},
   point: function(evt) {
     var position = $(Combat.map.canvas).position();
@@ -105,25 +102,19 @@ Combat.map = {
       Combat.draw();
     },
     reset: function() {
-      var that = this;
-      $.ajax({ type: 'POST', url: Combat.url + "/reset",
-        data: { aspect: Combat.map.canvas.width * 1.0 / Combat.map.canvas.height },
-        success: function(results) { that.load(results); }
-      });
+      var data = { aspect: Combat.map.canvas.width * 1.0 / Combat.map.canvas.height };
+      $.ajax({ type: 'POST', url: Combat.url + "/reset", data: data })
+        .success(_.bind(function(results) { this.load(results) }, this));
     },
     zoom: function(direction) {
       var that = this;
-      $.ajax({ type: 'POST', url: Combat.url + "/zoom",
-        data: { direction: direction },
-        success: function(results) { that.load(results); }
-      });
+      $.ajax({ type: 'POST', url: Combat.url + "/zoom", data: { direction: direction } })
+        .success(_.bind(function(results) { this.load(results) }, this));
     },
     pan: function(direction, axis) {
       var that = this;
-      $.ajax({ type: 'POST', url: Combat.url + "/pan",
-        data: { direction: direction, axis: axis },
-        success: function(results) { that.load(results); }
-      });
+      $.ajax({ type: 'POST', url: Combat.url + "/pan", data: { direction: direction, axis: axis } })
+        .success(_.bind(function(results) { this.load(results) }, this));
     }
   }
 }

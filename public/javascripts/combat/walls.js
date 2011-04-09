@@ -1,10 +1,10 @@
 Combat.walls = {
   init: function(json) {
-    this.all = _.map(json, function(json) { return new this.build(json); }, this);
+    this.all = _(json).map(function(json) { return new this.build(json); }, this);
     this.url = Combat.url + '/walls';
   },
 
-  draw: function(context) { _.each(this.all, function(object) { object.draw(context); }); },
+  draw: function(context) { _(this.all).each(function(object) { object.draw(context); }); },
 
   create: function(attrs) {
     var wall = new Combat.walls.build(attrs);
@@ -21,7 +21,7 @@ Combat.walls = {
     this.load = function(json) {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      _.each(fields, function(field) { if (!(json[field] === undefined)) { this.attrs[field] = json[field]; } }, this);
+      _(fields).each(function(field) { if (!(json[field] === undefined)) { this.attrs[field] = json[field]; } }, this);
       if (this.attrs.vertices) { this.tile = this.attrs.vertices[0]; }
     }
 
@@ -66,7 +66,7 @@ Combat.walls = {
 
     this.move = function(point) {
       var offset = { x: point.tile.x - this.tile.x, y: point.tile.y - this.tile.y };
-      _.each(this.attrs.vertices, function(vertex) { vertex.x += offset.x; vertex.y += offset.y; });
+      _(this.attrs.vertices).each(function(vertex) { vertex.x += offset.x; vertex.y += offset.y; });
       this.save();
     }
 
@@ -89,8 +89,8 @@ Combat.walls = {
       context.lineWidth = lineWidth
       if (this.attrs.kind == 'drawing') {
         context.lineJoin = 'round';
-        var v0 = _.first(this.attrs.vertices);
-        _.each(_.rest(this.attrs.vertices), function(v1) {
+        var v0 = _(this.attrs.vertices).first();
+        _(this.attrs.vertices).chain().rest().each(function(v1) {
           context.beginPath();
           context.moveTo(v0.x, v0.y);
           context.lineTo(v1.x, v1.y);
@@ -98,10 +98,10 @@ Combat.walls = {
           v0 = v1;
         });
       } else if (this.attrs.kind == 'wall') {
-        var v = _.first(this.attrs.vertices);
+        var v = _(this.attrs.vertices).first();
         context.beginPath();
         context.moveTo(v.x, v.y);
-        _.each(_.rest(this.attrs.vertices), function(v) { context.lineTo(v.x, v.y); });
+        _(this.attrs.vertices).chain().rest().each(function(v) { context.lineTo(v.x, v.y); });
         context.stroke();
       }
       context.restore();

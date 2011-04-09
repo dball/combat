@@ -1,11 +1,10 @@
 Combat.pictures = {
   init: function(json) {
-    var that = this;
-    this.all = $.map(json, function(json) { return new that.build(json); });
+    this.all = _(json).map(function(json) { return new this.build(json); }, this);
     this.url = Combat.url + '/images';
   },
 
-  draw: function(context) { $.each(this.all, function() { this.draw(context); }); },
+  draw: function(context) { _(this.all).each(function() { this.draw(context); }); },
 
   create: function(attrs) {
     var picture = new Combat.pictures.build(attrs);
@@ -21,14 +20,12 @@ Combat.pictures = {
     this.fields = ['x', 'y', 'width', 'height', 'url'];
 
     this.load = function(json) {
-      var that = this;
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      $.each(fields, function(i, field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } });
+      _(fields).each(function(field) { if (!(json[field] === undefined)) { this.attrs[field] = json[field]; } }, this);
       if (this.attrs.url) {
         this.img = new Image();
-        var that = this;
-        this.img.onload = function(arg) { if (that.attrs.x && that.attrs.y) { Combat.draw(); } }
+        this.img.onload = _.bind(function(arg) { if (this.attrs.x && this.attrs.y) { Combat.draw(); } }, this);
         this.img.src = this.attrs.url;
       }
       this.tile = Combat.map.points.create(this.attrs).tile;
@@ -137,15 +134,14 @@ Combat.pictures = {
 
     this.params = function() {
       var params = {};
-      var that = this;
-      $.each(this.fields, function(i, field) { params['image[' + field + ']'] = that.attrs[field]; });
+      _(this.fields).each(function(field) { params['image[' + field + ']'] = this.attrs[field]; }, this);
       return params;
     }
 
     this.save = function() {
       if (this.attrs.id == null) {
-        var that = this;
-        $.ajax({ type: 'POST', url: this.url(), data: this.params(), success: function(json) { that.load(json, 'id'); } });
+        $.ajax({ type: 'POST', url: this.url(), data: this.params() })
+          .success(_.bind(function(json) { this.load(json, 'id'); }, this));
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }

@@ -32,8 +32,8 @@ Combat.map = {
           x: Math.floor(point.x),
           y: Math.floor(point.y),
           minus: function(tile) { return Combat.map.points.create({ x: this.x - tile.x, y: this.y - tile.y }).tile; }
-        },
-      }
+        }
+      };
     },
     line: function(t0, t1) {
       var results = [];
@@ -54,10 +54,10 @@ Combat.map = {
       var ystep = (y0 < y1 ? 1 : -1);
       for (var x = x0; x <= x1; x++) {
         results.push(steep ? { x: y, y: x } : { x: x, y: y });
-        error = error - dy
+        error = error - dy;
         if (error < 0) {
-          y = y + ystep
-          error = error + dx
+          y = y + ystep;
+          error = error + dx;
         }
       }
       return $.map(results, function(attrs) { return Combat.map.points.create(attrs); });
@@ -72,11 +72,12 @@ Combat.map = {
 
     context.save();
     context.beginPath();
-    for (var i=Math.ceil(this.viewport.left), right = Math.floor(this.viewport.left + this.viewport.width); i <= right; i++) {
+    var i;
+    for (i = Math.ceil(this.viewport.left), right = Math.floor(this.viewport.left + this.viewport.width); i <= right; i++) {
       context.moveTo(i, this.viewport.top);
       context.lineTo(i, this.viewport.top + this.viewport.height);
     }
-    for (var i=Math.ceil(this.viewport.top), bottom = Math.floor(this.viewport.top + this.viewport.height); i <= bottom; i++) {
+    for (i = Math.ceil(this.viewport.top), bottom = Math.floor(this.viewport.top + this.viewport.height); i <= bottom; i++) {
       context.moveTo(this.viewport.left, i);
       context.lineTo(this.viewport.left + this.viewport.width, i);
     }
@@ -84,7 +85,7 @@ Combat.map = {
     context.strokeStyle = 'rgba(100, 100, 100, 1)';
     context.stroke();
     context.restore();
-    for (var i=0, l=arguments.length; i < l; i++) { arguments[i].draw(context); }
+    for (i = 0, l = arguments.length; i < l; i++) { arguments[i].draw(context); }
   },
   setContext: function() {
     this.tiles.size = (this.canvas.width * 1.0 / this.viewport.width) * this.viewport.scale;
@@ -104,17 +105,17 @@ Combat.map = {
     reset: function() {
       var data = { aspect: Combat.map.canvas.width * 1.0 / Combat.map.canvas.height };
       $.ajax({ type: 'POST', url: Combat.url + "/reset", data: data })
-        .success(_.bind(function(results) { this.load(results) }, this));
+        .success(_.bind(function(results) { this.load(results); }, this));
     },
     zoom: function(direction) {
       var that = this;
       $.ajax({ type: 'POST', url: Combat.url + "/zoom", data: { direction: direction } })
-        .success(_.bind(function(results) { this.load(results) }, this));
+        .success(_.bind(function(results) { this.load(results); }, this));
     },
     pan: function(direction, axis) {
       var that = this;
       $.ajax({ type: 'POST', url: Combat.url + "/pan", data: { direction: direction, axis: axis } })
-        .success(_.bind(function(results) { this.load(results) }, this));
+        .success(_.bind(function(results) { this.load(results); }, this));
     }
   }
-}
+};

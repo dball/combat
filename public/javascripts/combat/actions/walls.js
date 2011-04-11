@@ -26,7 +26,7 @@ Combat.actions.register({
     this.control = control;
     var action = this;
     control.find('button').click(function(evt) {
-      if (Combat.actions.active == null) {
+      if (Combat.actions.active === null) {
         Combat.actions.start(action, evt);
       } else {
         Combat.actions.stop(action);

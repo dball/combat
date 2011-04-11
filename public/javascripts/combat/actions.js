@@ -4,7 +4,7 @@ Combat.actions = {
   triggers: {
     keys: {},
     mouse: {},
-    controls: [],
+    controls: []
   },
   flags: {
     swallowClick: false
@@ -40,10 +40,13 @@ Combat.actions = {
       return;
     }
     var action = Combat.actions.active;
-    if (action != null) {
+    if (action !== null) {
       if (action.click) { action.click(evt); }
-    } else if (action = Combat.actions.triggers.mouse.click) {
-      Combat.actions.start(action, evt);
+    } else {
+      action = Combat.actions.triggers.mouse.click;
+      if (action !== null) {
+        Combat.actions.start(action, evt);
+      }
     }
   },
   mousemove: function(evt) {
@@ -70,21 +73,25 @@ Combat.actions = {
     var action = Combat.actions.active;
     if (action) {
       if (action.mousewheel) { action.mousewheel(evt, delta); }
-    } else if (action = Combat.actions.triggers.mouse.wheel) {
-      Combat.actions.start(action, evt, delta);
+    } else {
+      action = Combat.actions.triggers.mouse.wheel;
+      if (action !== null) {
+        Combat.actions.start(action, evt, delta);
+      }
     }
   },
   keypress: function(evt) {
     if ($(evt.target).is(":input")) { return; }
     var action = Combat.actions.active;
-    if (action != null) {
+    if (action !== null) {
       if (action.keypress) {
         evt.preventDefault();
         action.keypress(evt);
       }
     } else {
-      var key = evt.charCode != 0 ? String.fromCharCode(evt.charCode) : evt.keyCode
-      if (action = Combat.actions.triggers.keys[key]) {
+      var key = evt.charCode !== 0 ? String.fromCharCode(evt.charCode) : evt.keyCode;
+      action = Combat.actions.triggers.keys[key];
+      if (action !== null) {
         evt.preventDefault();
         Combat.actions.start(action, evt);
       }
@@ -134,37 +141,38 @@ Combat.actions = {
       for (var i = 0; i < files.length; i++) {
         var file = files[i];
         var reader = new FileReader();  
-        reader.onload = function(load_event) {
-          var xhr = new XMLHttpRequest();  
-          xhr.open("POST", Combat.url + "/images", true);  
-          xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-          xhr.setRequestHeader("Content-Length", file.fileSize);
-          xhr.setRequestHeader("Content-Type", file.type);
-          xhr.sendAsBinary(this.result);
-          xhr.onreadystatechange = function (e) {  
-            if (xhr.readyState == 4) {  
-              if (xhr.status == 201) {
-                var json = $.parseJSON(xhr.responseText);
-                var point = Combat.map.point(drop_event);
-                json.x = point.tile.x;
-                json.y = point.tile.y;
-                if (json.aspect_ratio < 1) {
-                  json.width = 1;
-                  json.height = 1 / json.aspect_ratio;
-                } else {
-                  json.width = json.aspect_ratio;
-                  json.height = 1;
-                }
-                Combat.pictures.create(json);
-                Combat.draw();
-              } else {
-                console.log("error", xhr);
-              }
-            }
-          }
-        }
+        reader.onload = this.loadFile;
         reader.readAsBinaryString(file);  
       }
     }, true);
+  },
+  loadFile: function(load_event) {
+    var xhr = new XMLHttpRequest();  
+    xhr.open("POST", Combat.url + "/images", true);  
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.setRequestHeader("Content-Length", file.fileSize);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.sendAsBinary(this.result);
+    xhr.onreadystatechange = function (e) {  
+      if (xhr.readyState == 4) {  
+        if (xhr.status == 201) {
+          var json = $.parseJSON(xhr.responseText);
+          var point = Combat.map.point(drop_event);
+          json.x = point.tile.x;
+          json.y = point.tile.y;
+          if (json.aspect_ratio < 1) {
+            json.width = 1;
+            json.height = 1 / json.aspect_ratio;
+          } else {
+            json.width = json.aspect_ratio;
+            json.height = 1;
+          }
+          Combat.pictures.create(json);
+          Combat.draw();
+        } else {
+          console.log("error", xhr);
+        }
+      }
+    };
   }
-}
+};

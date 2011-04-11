@@ -21,16 +21,16 @@ Combat.walls = {
     this.load = function(json) {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      _(fields).each(function(field) { if (!(json[field] === undefined)) { this.attrs[field] = json[field]; } }, this);
+      _(fields).each(function(field) { if (json[field] !== undefined) { this.attrs[field] = json[field]; } }, this);
       if (this.attrs.vertices) { this.tile = this.attrs.vertices[0]; }
-    }
+    };
 
     this.url = function() {
       var parts = [Combat.walls.url];
       if (this.attrs.id) { parts.push(this.attrs.id); }
       var args = Array.prototype.slice.call(arguments);
       return parts.concat(args).join('/');
-    }
+    };
 
     this.copy = function() {
       var attrs = $.extend(true, {}, this.attrs);
@@ -38,37 +38,37 @@ Combat.walls = {
       var copy = new Combat.walls.build(attrs);
       Combat.walls.all.push(copy);
       return copy;
-    }
+    };
 
     this.params = function() {
       var params = {};
       params['wall[kind]'] = this.attrs.kind;
       params['wall[vertex_values]'] = $.map(this.attrs.vertices, function(vertex) { return { x: vertex.x, y: vertex.y }; });
       return params;
-    }
+    };
 
     this.save = function() {
-      if (this.attrs.id == null) {
+      if (this.attrs.id === null) {
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
           .success(_.bind(function(json) { this.load(json, 'id'); }, this));
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
-    }
+    };
 
     this.destroy = function() {
       var all = Combat.walls.all;
       var index = all.indexOf(this);
-      if (index == null) { throw 'selected does not appear in the list of walls'; }
+      if (index === null) { throw 'selected does not appear in the list of walls'; }
       all.splice(index, 1);
       $.ajax({ type: 'DELETE', url: this.url() });
-    }
+    };
 
     this.move = function(point) {
       var offset = { x: point.tile.x - this.tile.x, y: point.tile.y - this.tile.y };
       _(this.attrs.vertices).each(function(vertex) { vertex.x += offset.x; vertex.y += offset.y; });
       this.save();
-    }
+    };
 
     this.contains = function(point, evt) {
       for (var i=0, l = this.attrs.vertices.length; i < l; i++) {
@@ -77,16 +77,16 @@ Combat.walls = {
           return { x: point.x - this.tile.x, y: point.y - this.tile.y };
         }
       }
-    }
+    };
 
     this.draw = function(context) {
       this.drawVertices(context, 0.15);
-    }
+    };
 
     this.drawVertices = function(context, lineWidth) {
       if (!this.attrs.vertices || this.attrs.vertices.length <= 1) { return; }
       context.save();
-      context.lineWidth = lineWidth
+      context.lineWidth = lineWidth;
       if (this.attrs.kind == 'drawing') {
         context.lineJoin = 'round';
         var v0 = _(this.attrs.vertices).first();
@@ -105,15 +105,15 @@ Combat.walls = {
         context.stroke();
       }
       context.restore();
-    }
+    };
 
     this.drawBorder = function(context) {
       context.save();
       context.shadowBlur = 5;
       this.drawVertices(context, 0.2);
       context.restore();
-    }
+    };
 
     this.load(json, 'id');
   }
-}
+};

@@ -13,7 +13,7 @@ Combat.effects = {
     },
     smaller: function(size) {
       var index = this.values.indexOf(size);
-      if (index == -1 || index == 0) { return this.values[0]; }
+      if (index == -1 || index === 0) { return this.values[0]; }
       return this.values[index - 1];
     }
   },
@@ -33,49 +33,48 @@ Combat.effects = {
     this.fields = ['x', 'y', 'shape', 'size'];
 
     this.load = function(json) {
-      var that = this;
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
-      _(fields).each(function(field) { if (!(json[field] === undefined)) { that.attrs[field] = json[field]; } }, this);
+      _(fields).each(function(field) { if (json[field] !== undefined) { this.attrs[field] = json[field]; } }, this);
       this.tile = Combat.map.points.create({ x: this.attrs.x, y: this.attrs.y }).tile;
-    }
+    };
 
     this.url = function() {
       var parts = [Combat.effects.url];
       if (this.attrs.id) { parts.push(this.attrs.id); }
       var args = Array.prototype.slice.call(arguments);
       return parts.concat(args).join('/');
-    }
+    };
 
     this.params = function() {
       var params = {};
       _(this.fields).each(function(field) { params['effect[' + field + ']'] = this.attrs[field]; }, this);
       return params;
-    }
+    };
 
     this.save = function() {
-      if (this.attrs.id == null) {
+      if (this.attrs.id === null) {
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
           .success(_.bind(function(json) { this.load(json, 'id'); }, this));
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
-    }
+    };
 
     this.destroy = function() {
       var all = Combat.effects.all;
       var index = all.indexOf(this);
-      if (index == null) { throw 'selected does not appear in the list of effects'; }
+      if (index === null) { throw 'selected does not appear in the list of effects'; }
       all.splice(index, 1);
       $.ajax({ type: 'DELETE', url: this.url() });
-    }
+    };
 
     this.move = function(point) {
       this.tile = point.tile;
       this.attrs.x = this.tile.x;
       this.attrs.y = this.tile.y;
       this.save();
-    }
+    };
 
     this.draw = function(context, lineWidth) {
       context.save();
@@ -104,7 +103,7 @@ Combat.effects = {
         throw 'Unsupported shape ' + shape;
       }
       context.restore();
-    }
+    };
 
     this.contains = function(point, evt) {
       if (this.attrs.shape == 'circle') {
@@ -115,15 +114,15 @@ Combat.effects = {
       } else {
         throw 'Unsupported shape ' + shape;
       }
-    }
+    };
 
     this.drawBorder = function(context) {
       context.save();
       context.shadowBlur = 5;
       this.draw(context, 0.2);
       context.restore();
-    }
+    };
 
     this.load(json, 'id');
   }
-}
+};

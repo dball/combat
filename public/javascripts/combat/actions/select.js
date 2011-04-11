@@ -18,7 +18,7 @@ Combat.actions.register({
     control.find('button').click(function(evt) {
       if (Combat.actions.active == action) {
         var current = action.things.current;
-        if (current != null) { current.thing.destroy(); }
+        if (current !== null) { current.thing.destroy(); }
         Combat.actions.stop(action);
       }
     });
@@ -34,9 +34,9 @@ Combat.actions.register({
     all: [],
     next: function() {
       var length = this.all.length;
-      if (length == 0) {
+      if (length === 0) {
         this.index = null;
-      } else if (this.index == null) {
+      } else if (this.index === null) {
         this.index = 0;
       } else if (this.index < length - 1) {
         this.index += 1;
@@ -44,7 +44,7 @@ Combat.actions.register({
         this.index = null;
       }
       if (this.current) { this.current.thing.selected = false; }
-      this.current = (this.index != null ? this.all[this.index] : null);
+      this.current = (this.index !== null ? this.all[this.index] : null);
       if (this.current) { this.current.thing.selected = true; }
       return this.current;
     },
@@ -62,7 +62,7 @@ Combat.actions.register({
   },
   click: function(evt) {
     this.points.current = Combat.map.point(evt);
-    if (this.points.start == null) {
+    if (this.points.start === null) {
       this.shift = evt.shiftKey;
       this.points.start = this.points.current;
       var that = this;
@@ -105,14 +105,14 @@ Combat.actions.register({
   },
   keypress: function(evt) {
     var current = this.things.current;
-    if (current != null) {
+    if (current !== null) {
       if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
         evt.preventDefault();
         current.thing.destroy();
         Combat.actions.stop(this);
         return;
       // TODO This is obviously figure-specific behavior which should get extracted out to a sub-action? ho ho ho.
-      } else if (evt.charCode != 0) {
+      } else if (evt.charCode !== 0) {
         var key = String.fromCharCode(evt.charCode);
         switch(key) {
           case ']':
@@ -154,7 +154,7 @@ Combat.actions.register({
           for (var p = points[0], i = 1, l = points.length; i < l; i++) {
             var pi = points[i];
             if (p.x != pi.x && p.y != pi.y) {
-              if (dmod == 0) { dmod = 1; distance += 5; } else { dmod = 0; distance += 10; }
+              if (dmod === 0) { dmod = 1; distance += 5; } else { dmod = 0; distance += 10; }
             } else {
               distance += 5;
             }

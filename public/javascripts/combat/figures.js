@@ -18,7 +18,7 @@ Combat.figures = {
     },
     smaller: function(size) {
       var index = this.order.indexOf(size);
-      if (index == -1 || index == 0) { return this.order[0]; }
+      if (index == -1 || index === 0) { return this.order[0]; }
       return this.order[index - 1];
     }
   },
@@ -42,21 +42,21 @@ Combat.figures = {
       var args = Array.prototype.slice.call(arguments);
       var fields = this.fields.concat(args.slice(1));
       _(fields).each(function(field) {
-        if (!(json[field] === undefined)) {
+        if (json[field] !== undefined) {
           this.attrs[field] = json[field];
         }
       }, this);
       this.tile = Combat.map.points.create(
         { x: this.attrs.position_x, y: this.attrs.position_y }
       ).tile;
-    }
+    };
 
     this.url = function() {
       var parts = [Combat.figures.url];
       if (this.attrs.id) { parts.push(this.attrs.id); }
       var args = Array.prototype.slice.call(arguments);
       return parts.concat(args).join('/');
-    }
+    };
 
     this.params = function() {
       var params = {};
@@ -64,10 +64,10 @@ Combat.figures = {
         params['figure[' + field + ']'] = this.attrs[field];
       }, this);
       return params;
-    }
+    };
 
     this.save = function() {
-      if (this.attrs.id == null) {
+      if (this.attrs.id === null) {
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
           .success(_.bind(function(json) {
             if (json.subscript == '1') {
@@ -83,43 +83,43 @@ Combat.figures = {
       } else {
         $.ajax({ type: 'PUT', url: this.url(), data: this.params() });
       }
-    }
+    };
 
     this.destroy = function() {
       var all = Combat.figures.all;
       var index = all.indexOf(this);
-      if (index == null) { throw 'selected does not appear in the list of figures'; }
+      if (index === null) { throw 'selected does not appear in the list of figures'; }
       all.splice(index, 1);
       $.ajax({ type: 'DELETE', url: this.url() });
-    }
+    };
 
     this.enlarge = function() {
       $.ajax({ type: 'POST', url: this.url('enlarge') })
         .success(_.bind(function(results) { this.load(results); Combat.draw(); }, this));
-    }
+    };
 
     this.reduce = function() {
       $.ajax({ type: 'POST', url: this.url('reduce') })
         .success(_.bind(function(results) { this.load(results); Combat.draw(); }, this));
-    }
+    };
 
     this.scale = function() {
       var scale = Combat.figures.sizes[this.attrs.size];
       return (scale ? scale : 1);
-    }
+    };
 
     this.move = function(point) {
       this.tile = point.tile;
       this.attrs.position_x = this.tile.x;
       this.attrs.position_y = this.tile.y;
       this.save();
-    }
+    };
 
     this.contains = function(point) {
       var scale = this.scale();
       var offset = { x: point.x - this.tile.x, y: point.y - this.tile.y };
       return ((offset.x >= 0 && offset.x < scale && offset.y >= 0 && offset.y < scale) ? offset : null);
-    }
+    };
 
     this.draw = function(context) {
       context.save();
@@ -133,7 +133,7 @@ Combat.figures = {
       context.restore();
       this.drawLetter(context);
       context.restore();
-    }
+    };
 
     this.drawLetter = function(context) {
       var scale = this.scale();
@@ -163,14 +163,14 @@ Combat.figures = {
       context.fillText(this.attrs.letter, offset, offset);
       context.restore();
       */
-    }
+    };
 
     this.drawBorder = function(context) {
       var scale = this.scale();
       context.strokeRect(this.tile.x, this.tile.y, scale, scale);
-    }
+    };
 
     this.load(json, 'id');
   }
-}
+};
 

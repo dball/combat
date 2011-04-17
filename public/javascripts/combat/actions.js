@@ -6,9 +6,6 @@ Combat.actions = {
     mouse: {},
     controls: []
   },
-  flags: {
-    swallowClick: false
-  },
   draw: function(context) {
     if (this.active && this.active.draw) { this.active.draw(context); }
   },
@@ -35,10 +32,6 @@ Combat.actions = {
     action.begin.apply(action, args.slice(1));
   },
   click: function(evt) {
-    if (Combat.actions.flags.swallowClick) {
-      Combat.actions.flags.swallowClick = false;
-      return;
-    }
     var action = Combat.actions.active;
     if (action !== null) {
       if (action.click) { action.click(evt); }
@@ -59,7 +52,7 @@ Combat.actions = {
   },
   mouseup: function(evt) {
     var action = Combat.actions.active;
-    if (action && action.mouseup) { action.mouseup(evt); /* Combat.actions.flags.swallowClick = true; */ }
+    if (action && action.mouseup) { action.mouseup(evt); }
   },
   mouseenter: function(evt) {
     var action = Combat.actions.active;

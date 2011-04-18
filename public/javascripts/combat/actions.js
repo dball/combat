@@ -32,50 +32,50 @@ Combat.actions = {
     action.begin.apply(action, args.slice(1));
   },
   click: function(evt) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action !== null) {
       if (action.click) { action.click(evt); }
     } else {
-      action = Combat.actions.triggers.mouse.click;
+      action = this.triggers.mouse.click;
       if (action !== null) {
-        Combat.actions.start(action, evt);
+        this.start(action, evt);
       }
     }
   },
   mousemove: function(evt) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action && action.mousemove) { action.mousemove(evt); }
   },
   mousedown: function(evt) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action && action.mousedown) { action.mousedown(evt); }
   },
   mouseup: function(evt) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action && action.mouseup) { action.mouseup(evt); }
   },
   mouseenter: function(evt) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action && action.mouseenter) { action.mouseenter(evt); }
   },
   mouseleave: function(evt) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action && action.mouseleave) { action.mouseleave(evt); }
   },
   mousewheel: function(evt, delta) {
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action) {
       if (action.mousewheel) { action.mousewheel(evt, delta); }
     } else {
-      action = Combat.actions.triggers.mouse.wheel;
+      action = this.triggers.mouse.wheel;
       if (action !== null) {
-        Combat.actions.start(action, evt, delta);
+        this.start(action, evt, delta);
       }
     }
   },
   keypress: function(evt) {
     if ($(evt.target).is(":input")) { return; }
-    var action = Combat.actions.active;
+    var action = this.active;
     if (action !== null) {
       if (action.keypress) {
         evt.preventDefault();
@@ -83,10 +83,10 @@ Combat.actions = {
       }
     } else {
       var key = evt.charCode !== 0 ? String.fromCharCode(evt.charCode) : evt.keyCode;
-      action = Combat.actions.triggers.keys[key];
+      action = this.triggers.keys[key];
       if (action !== null) {
         evt.preventDefault();
-        Combat.actions.start(action, evt);
+        this.start(action, evt);
       }
     }
     if (evt.keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
@@ -96,7 +96,7 @@ Combat.actions = {
   keyup: function(evt) {
     if (evt.keyCode == KeyEvent.DOM_VK_ESCAPE) {
       evt.preventDefault();
-      Combat.actions.stop();
+      this.stop();
     }
   },
   gesturechange: function(evt) {
@@ -169,3 +169,5 @@ Combat.actions = {
     };
   }
 };
+
+_.bindAll(Combat.actions);

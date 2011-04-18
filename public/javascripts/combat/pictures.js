@@ -139,7 +139,7 @@ Combat.pictures = {
     };
 
     this.save = function() {
-      if (this.attrs.id !== null) {
+      if (!this.attrs.id) {
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
           .success(_.bind(function(json) { this.load(json, 'id'); }, this));
       } else {

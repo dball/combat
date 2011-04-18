@@ -67,7 +67,8 @@ Combat.figures = {
     };
 
     this.save = function() {
-      if (this.attrs.id === null) {
+      console.log("saving", this);
+      if (!this.attrs.id) {
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
           .success(_.bind(function(json) {
             if (json.subscript == '1') {

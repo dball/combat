@@ -73,7 +73,14 @@ Combat.actions.register({
       context.globalAlpha = 0.5;
       wall.draw(context);
       context.restore();
-      if (this.point) { this.vertices.pop(); }
+      if (this.point) {
+        this.vertices.pop();
+        if (this.vertices.length >= 1) {
+          var points = Combat.map.points.line(_(this.vertices).last(), this.point.tile);
+          var distance = Combat.map.distance(points);
+          Combat.map.drawTooltip(context, this.point, '' + distance + ' ft');
+        }
+      }
     } else {
       wall.draw(context);
     }

@@ -36,7 +36,6 @@ Combat.figures = {
   },
 
   build: function(json) {
-    console.log("building figure", json);
     this.type = 'figure';
     this.attrs = {};
     this.tile = null;

@@ -1,6 +1,9 @@
 Combat.walls = {
   init: function(json) {
-    this.all = _(json).map(function(json) { return new this.build(json); }, this);
+    this.all = _(json).chain()
+      .map(function(json) { return new this.build(json); }, this)
+      .compact()
+      .value();
     this.url = Combat.url + '/walls';
   },
 

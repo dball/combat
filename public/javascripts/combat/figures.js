@@ -1,6 +1,9 @@
 Combat.figures = {
   init: function(json) {
-    this.all = _(json).map(function(json) { if (!json.deleted_at) { return new this.build(json); } }, this);
+    this.all = _(json).chain()
+      .map(function(json) { if (!json.deleted_at) { return new this.build(json); } }, this)
+      .compact()
+      .value();
     this.url = Combat.url + '/figures';
   },
 
@@ -67,7 +70,6 @@ Combat.figures = {
     };
 
     this.save = function() {
-      console.log("saving", this);
       if (!this.attrs.id) {
         $.ajax({ type: 'POST', url: this.url(), data: this.params() })
           .success(_.bind(function(json) {

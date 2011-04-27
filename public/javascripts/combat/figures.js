@@ -1,5 +1,6 @@
 Combat.figures = {
   init: function(json) {
+    console.log("Init figures", json);
     this.all = _(json).map(function(json) { if (!json.deleted_at) { return new this.build(json); } }, this);
     this.url = Combat.url + '/figures';
   },
@@ -33,6 +34,7 @@ Combat.figures = {
   },
 
   build: function(json) {
+    console.log("building figure", json);
     this.type = 'figure';
     this.attrs = {};
     this.tile = null;
